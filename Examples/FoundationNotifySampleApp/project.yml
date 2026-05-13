@@ -21,5 +21,16 @@ targets:
         product: SmartNotifications
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.example.foundationnotify.sample
-      INFOPLIST_FILE: Info.plist
       TARGETED_DEVICE_FAMILY: "1"
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: FoundationNotify Sample
+        LSRequiresIPhoneOS: true
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
