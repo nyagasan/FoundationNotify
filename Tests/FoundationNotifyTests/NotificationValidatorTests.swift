@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import SmartNotifications
+@testable import FoundationNotify
 
 final class NotificationValidatorTests: XCTestCase {
     func testValidDraftPasses() throws {
@@ -12,7 +12,7 @@ final class NotificationValidatorTests: XCTestCase {
         let draft = NotificationDraft(title: " ", body: "Review five words now.")
 
         XCTAssertThrowsError(try NotificationValidator().validate(draft)) { error in
-            XCTAssertEqual(error as? SmartNotificationError, .validationFailed([.emptyTitle]))
+            XCTAssertEqual(error as? FoundationNotify.Error, .validationFailed([.emptyTitle]))
         }
     }
 
@@ -27,7 +27,7 @@ final class NotificationValidatorTests: XCTestCase {
 
         XCTAssertThrowsError(try NotificationValidator().validate(draft, constraints: constraints)) { error in
             XCTAssertEqual(
-                error as? SmartNotificationError,
+                error as? FoundationNotify.Error,
                 .validationFailed([
                     .titleTooLong(max: 4, actual: 8),
                     .bodyTooLong(max: 10, actual: 26),
@@ -41,7 +41,7 @@ final class NotificationValidatorTests: XCTestCase {
         let draft = NotificationDraft(title: "Quiet note", body: "A short neutral sentence.")
 
         XCTAssertThrowsError(try NotificationValidator().validate(draft)) { error in
-            XCTAssertEqual(error as? SmartNotificationError, .validationFailed([.missingActionableCopy]))
+            XCTAssertEqual(error as? FoundationNotify.Error, .validationFailed([.missingActionableCopy]))
         }
     }
 
@@ -51,7 +51,7 @@ final class NotificationValidatorTests: XCTestCase {
 
         XCTAssertThrowsError(try NotificationValidator().validate(trigger, now: now)) { error in
             XCTAssertEqual(
-                error as? SmartNotificationError,
+                error as? FoundationNotify.Error,
                 .invalidSchedule("Date trigger must be in the future.")
             )
         }
@@ -63,7 +63,7 @@ final class NotificationValidatorTests: XCTestCase {
 
         XCTAssertThrowsError(try NotificationValidator().validate(.calendar(components, repeats: true))) { error in
             XCTAssertEqual(
-                error as? SmartNotificationError,
+                error as? FoundationNotify.Error,
                 .invalidSchedule("Calendar hour must be between 0 and 23.")
             )
         }

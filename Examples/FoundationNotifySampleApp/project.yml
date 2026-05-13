@@ -18,7 +18,7 @@ targets:
       - Sources
     dependencies:
       - package: FoundationNotify
-        product: SmartNotifications
+        product: FoundationNotify
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.example.foundationnotify.sample
       TARGETED_DEVICE_FAMILY: "1"

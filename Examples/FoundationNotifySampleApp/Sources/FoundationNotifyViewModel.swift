@@ -3,12 +3,12 @@ import Observation
 #if canImport(FoundationModels)
 import FoundationModels
 #endif
-import SmartNotifications
+import FoundationNotify
 @preconcurrency import UserNotifications
 
 @MainActor
 @Observable
-final class SmartNotificationViewModel {
+final class FoundationNotifyViewModel {
     var context = "Remind me to review the FoundationNotify sample notification flow in one minute."
     var tone: NotificationTone = .friendly
     var intent: NotificationIntent = .reminder
@@ -24,15 +24,15 @@ final class SmartNotificationViewModel {
     private(set) var isRunning = false
 
     func refresh() async {
-        authorizationStatusText = await SmartNotification.authorizationStatus().rawValue
+        authorizationStatusText = await FoundationNotify.authorizationStatus().rawValue
         refreshFoundationModelsStatus()
         await refreshPendingRequests()
     }
 
     func requestPermission() async {
         await run {
-            let granted = try await SmartNotification.requestAuthorization()
-            authorizationStatusText = await SmartNotification.authorizationStatus().rawValue
+            let granted = try await FoundationNotify.requestAuthorization()
+            authorizationStatusText = await FoundationNotify.authorizationStatus().rawValue
             lastErrorMessage = granted ? nil : "Notification permission was not granted."
             await refreshPendingRequests()
         }
@@ -40,7 +40,7 @@ final class SmartNotificationViewModel {
 
     func generateDraft() async {
         await run {
-            latestDraft = try await SmartNotification.generate(
+            latestDraft = try await FoundationNotify.generate(
                 context: context,
                 tone: tone,
                 intent: intent
@@ -50,7 +50,7 @@ final class SmartNotificationViewModel {
 
     func generateAndSchedule() async {
         await run {
-            let identifier = try await SmartNotification.schedule(
+            let identifier = try await FoundationNotify.schedule(
                 after: .minutes(delayMinutes),
                 context: context,
                 tone: tone,
@@ -68,7 +68,7 @@ final class SmartNotificationViewModel {
 
         do {
             try await operation()
-        } catch let error as SmartNotificationError {
+        } catch let error as FoundationNotify.Error {
             lastErrorMessage = message(for: error)
         } catch {
             lastErrorMessage = String(describing: error)
@@ -101,7 +101,7 @@ final class SmartNotificationViewModel {
         }
     }
 
-    private func message(for error: SmartNotificationError) -> String {
+    private func message(for error: FoundationNotify.Error) -> String {
         switch error {
         case let .generationFailed(message):
             return "generationFailed: \(message)"

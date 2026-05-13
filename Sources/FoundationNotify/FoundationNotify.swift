@@ -1,7 +1,11 @@
 import Foundation
 
-public enum SmartNotification {
-    public nonisolated(unsafe) static var client = SmartNotificationClient()
+public enum FoundationNotify {
+    public nonisolated(unsafe) static var client: Client = .init(
+        generator: FoundationModelsNotificationGenerator(),
+        scheduler: UserNotificationScheduler(),
+        authorizer: UserNotificationAuthorizationClient()
+    )
 
     public static func generate(
         context: String,
@@ -19,7 +23,7 @@ public enum SmartNotification {
         )
     }
 
-    public static func generate(_ request: SmartNotificationRequest) async throws -> NotificationDraft {
+    public static func generate(_ request: Request) async throws -> NotificationDraft {
         try await client.generate(request)
     }
 

@@ -1,8 +1,8 @@
-import SmartNotifications
+import FoundationNotify
 import SwiftUI
 
 struct ContentView: View {
-    @State private var viewModel = SmartNotificationViewModel()
+    @State private var viewModel = FoundationNotifyViewModel()
 
     var body: some View {
         NavigationStack {

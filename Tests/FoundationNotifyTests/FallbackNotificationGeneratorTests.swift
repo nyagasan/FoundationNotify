@@ -1,9 +1,9 @@
 import XCTest
-@testable import SmartNotifications
+@testable import FoundationNotify
 
 final class FallbackNotificationGeneratorTests: XCTestCase {
     func testFallbackGeneratorCreatesJapaneseActionableDraft() async throws {
-        let request = SmartNotificationRequest(
+        let request = FoundationNotify.Request(
             context: "ユーザーは英単語学習中。復習を促したい。",
             tone: .friendly,
             intent: .reminder,
@@ -19,7 +19,7 @@ final class FallbackNotificationGeneratorTests: XCTestCase {
     }
 
     func testFallbackGeneratorRespectsLengthConstraints() async throws {
-        let request = SmartNotificationRequest(
+        let request = FoundationNotify.Request(
             context: "Review your vocabulary flashcards now.",
             tone: .professional,
             intent: .learning,

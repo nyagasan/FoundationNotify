@@ -6,7 +6,7 @@ public struct NotificationValidator: Sendable {
     public func validate(_ draft: NotificationDraft, constraints: NotificationConstraints = .default) throws {
         let issues = validationIssues(for: draft, constraints: constraints)
         guard issues.isEmpty else {
-            throw SmartNotificationError.validationFailed(issues)
+            throw FoundationNotify.Error.validationFailed(issues)
         }
     }
 
@@ -14,11 +14,11 @@ public struct NotificationValidator: Sendable {
         switch trigger {
         case let .timeInterval(interval, _):
             guard interval > 0 else {
-                throw SmartNotificationError.invalidSchedule("Time interval must be greater than zero.")
+                throw FoundationNotify.Error.invalidSchedule("Time interval must be greater than zero.")
             }
         case let .date(date):
             guard date > now else {
-                throw SmartNotificationError.invalidSchedule("Date trigger must be in the future.")
+                throw FoundationNotify.Error.invalidSchedule("Date trigger must be in the future.")
             }
         case let .calendar(components, repeats):
             try validateCalendarComponents(components, repeats: repeats)
@@ -74,23 +74,23 @@ public struct NotificationValidator: Sendable {
 
     private func validateCalendarComponents(_ components: DateComponents, repeats: Bool) throws {
         if let hour = components.hour, !(0...23).contains(hour) {
-            throw SmartNotificationError.invalidSchedule("Calendar hour must be between 0 and 23.")
+            throw FoundationNotify.Error.invalidSchedule("Calendar hour must be between 0 and 23.")
         }
 
         if let minute = components.minute, !(0...59).contains(minute) {
-            throw SmartNotificationError.invalidSchedule("Calendar minute must be between 0 and 59.")
+            throw FoundationNotify.Error.invalidSchedule("Calendar minute must be between 0 and 59.")
         }
 
         if let second = components.second, !(0...59).contains(second) {
-            throw SmartNotificationError.invalidSchedule("Calendar second must be between 0 and 59.")
+            throw FoundationNotify.Error.invalidSchedule("Calendar second must be between 0 and 59.")
         }
 
         if let weekday = components.weekday, !(1...7).contains(weekday) {
-            throw SmartNotificationError.invalidSchedule("Calendar weekday must be between 1 and 7.")
+            throw FoundationNotify.Error.invalidSchedule("Calendar weekday must be between 1 and 7.")
         }
 
         if let day = components.day, !(1...31).contains(day) {
-            throw SmartNotificationError.invalidSchedule("Calendar day must be between 1 and 31.")
+            throw FoundationNotify.Error.invalidSchedule("Calendar day must be between 1 and 31.")
         }
 
         if repeats {
@@ -99,7 +99,7 @@ public struct NotificationValidator: Sendable {
                 || components.weekday != nil
                 || components.day != nil
             guard hasRepeatComponent else {
-                throw SmartNotificationError.invalidSchedule("Repeating calendar triggers need at least one date component.")
+                throw FoundationNotify.Error.invalidSchedule("Repeating calendar triggers need at least one date component.")
             }
         }
     }
