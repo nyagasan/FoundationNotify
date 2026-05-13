@@ -1,7 +1,7 @@
 import Foundation
 
 public enum SmartNotification {
-    public static var client = SmartNotificationClient()
+    public nonisolated(unsafe) static var client = SmartNotificationClient()
 
     public static func generate(
         context: String,

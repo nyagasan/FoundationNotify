@@ -1,9 +1,9 @@
 import Foundation
 
 #if canImport(UserNotifications)
-import UserNotifications
+@preconcurrency import UserNotifications
 
-public struct UserNotificationScheduler: NotificationScheduling {
+public struct UserNotificationScheduler: NotificationScheduling, @unchecked Sendable {
     private let center: UNUserNotificationCenter
 
     public init(center: UNUserNotificationCenter = .current()) {

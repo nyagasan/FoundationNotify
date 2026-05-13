@@ -1,14 +1,15 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 
 import PackageDescription
 
 let package = Package(
     name: "FoundationNotify",
     platforms: [
-        .iOS(.v16),
-        .macOS(.v13),
-        .watchOS(.v9),
-        .tvOS(.v16)
+        .iOS(.v26),
+        .macOS(.v26),
+        .watchOS(.v26),
+        .tvOS(.v26),
+        .visionOS(.v26)
     ],
     products: [
         .library(
@@ -18,11 +19,18 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "SmartNotifications"
+            name: "SmartNotifications",
+            swiftSettings: [
+                .swiftLanguageMode(.v6)
+            ]
         ),
         .testTarget(
             name: "SmartNotificationsTests",
-            dependencies: ["SmartNotifications"]
+            dependencies: ["SmartNotifications"],
+            swiftSettings: [
+                .swiftLanguageMode(.v6)
+            ]
         )
-    ]
+    ],
+    swiftLanguageModes: [.v6]
 )

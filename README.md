@@ -12,7 +12,7 @@ FoundationNotify is a Swift Package for generating privacy-preserving local noti
 - `NotificationGenerating`, `NotificationScheduling`, and `NotificationAuthorizing` protocols for dependency injection.
 - Validation for empty copy, length limits, forbidden phrases, actionable copy, and invalid schedules.
 - Async/await adapters for `UNUserNotificationCenter`.
-- Foundation Models integration point isolated behind `NotificationGenerating`, with a deterministic fallback generator for builds and tests.
+- Foundation Models structured generation via `@Generable` and `LanguageModelSession`, with a deterministic fallback generator for unavailable devices and tests.
 
 ## Installation
 
@@ -30,10 +30,11 @@ Then add the product to your target:
 
 ## Requirements
 
-- Swift 5.9 or later.
-- iOS 16+, macOS 13+, watchOS 9+, or tvOS 16+.
+- Xcode 26 or later.
+- Swift 6 language mode.
+- iOS 26+, macOS 26+, watchOS 26+, tvOS 26+, or visionOS 26+.
 - `UserNotifications` for real scheduling.
-- Apple Foundation Models availability depends on OS, device, and Xcode support. This package keeps Foundation Models usage behind `NotificationGenerating` so unsupported environments can still build and test with fallback or mock generators.
+- Apple Foundation Models on iOS 26 and sibling OS releases. Runtime model availability still depends on Apple Intelligence support, user settings, and model readiness.
 
 ## Quick Start
 
@@ -197,25 +198,26 @@ For unit tests, provide a mock `NotificationScheduling` implementation so tests 
 
 ## Foundation Models Availability
 
-`FoundationModelsNotificationGenerator` is intentionally isolated. The current package does not unconditionally call undocumented or unavailable Foundation Models APIs, because those APIs vary by OS and Xcode version. In unsupported environments it delegates to `FallbackNotificationGenerator`.
+`FoundationModelsNotificationGenerator` uses the WWDC25 GA Foundation Models API surface: `SystemLanguageModel.default.availability`, `LanguageModelSession`, guided structured generation with `@Generable` and `@Guide`, and `respond(to:generating:includeSchemaInPrompt:options:)`.
 
-When your app target has Foundation Models available, provide your own `NotificationGenerating` implementation using the Apple API surface supported by your deployment environment. That implementation can use structured generation and `@Generable` where available, then return `NotificationDraft`.
+The generator checks model availability before creating a response. If Foundation Models cannot be imported, the OS is below the supported availability, or `SystemLanguageModel` is unavailable at runtime, it delegates to `FallbackNotificationGenerator` by default. Pass `usesFallbackWhenUnavailable: false` if you prefer `SmartNotificationError.unsupportedPlatform`.
 
 ## Privacy
 
 FoundationNotify is designed for on-device notification copy generation. User context should stay inside the app process when you use an on-device generator. The fallback generator is deterministic and does not perform network requests.
+
+The Foundation Models implementation uses Apple’s on-device Foundation Models framework introduced as a public WWDC25 API. It does not add a server dependency or send notification context to a package-owned backend.
 
 ## Limitations
 
 - This package schedules Local Notifications only.
 - It does not send Push Notifications and does not integrate with APNs.
 - Real notification delivery behavior is controlled by the OS, user settings, Focus modes, and notification permissions.
-- Foundation Models support requires compatible Apple platform and toolchain availability.
+- Foundation Models support requires Xcode 26, compatible Apple platform availability, Apple Intelligence support, and a ready on-device model.
 - The fallback generator is intentionally simple and is meant for compatibility, tests, and graceful degradation.
 
 ## Roadmap
 
-- Native Foundation Models generator using structured output and `@Generable` when the public API surface is stable in supported toolchains.
 - Richer category/action modeling for notification actions.
 - Additional locale-aware prompt and validation policies.
 - Optional notification preview utilities for SwiftUI apps.

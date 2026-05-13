@@ -8,14 +8,20 @@ on:
 
 jobs:
   build-test:
-    name: Build & Test (macOS)
-    runs-on: macos-14
+    name: Build & Test (Xcode 26)
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app
+        run: |
+          set -euo pipefail
+          XCODE_PATH="$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' -print | sort | tail -n 1)"
+          if [ -z "$XCODE_PATH" ]; then
+            XCODE_PATH="/Applications/Xcode.app"
+          fi
+          sudo xcode-select -s "$XCODE_PATH"
 
       - name: Print toolchain
         run: |
@@ -23,7 +29,7 @@ jobs:
           xcodebuild -version
 
       - name: Swift build
-        run: swift build
+        run: swift build -Xswiftc -warnings-as-errors
 
       - name: Swift test
-        run: swift test
+        run: swift test -Xswiftc -warnings-as-errors

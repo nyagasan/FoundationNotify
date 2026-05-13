@@ -1,7 +1,7 @@
 #if canImport(UserNotifications)
-import UserNotifications
+@preconcurrency import UserNotifications
 
-public struct UserNotificationAuthorizationClient: NotificationAuthorizing {
+public struct UserNotificationAuthorizationClient: NotificationAuthorizing, @unchecked Sendable {
     private let center: UNUserNotificationCenter
 
     public init(center: UNUserNotificationCenter = .current()) {
