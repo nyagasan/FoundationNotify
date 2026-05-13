@@ -1,0 +1,10 @@
+# Swift / Xcode
+.build/
+.swiftpm/
+Package.resolved
+*.xcodeproj/
+DerivedData/
+.DS_Store
+
+# Codex prompt (local-only, not part of the library)
+prompt.md
