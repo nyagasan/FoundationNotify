@@ -100,7 +100,9 @@ final class SmartNotificationTests: XCTestCase {
             authorizer: MockNotificationAuthorizer(granted: true, status: .provisional)
         )
 
-        XCTAssertTrue(try await client.requestAuthorization())
-        XCTAssertEqual(await client.authorizationStatus(), .provisional)
+        let granted = try await client.requestAuthorization()
+        XCTAssertTrue(granted)
+        let status = await client.authorizationStatus()
+        XCTAssertEqual(status, .provisional)
     }
 }
