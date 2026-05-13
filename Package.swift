@@ -20,6 +20,9 @@ let package = Package(
     targets: [
         .target(
             name: "FoundationNotify",
+            resources: [
+                .process("PrivacyInfo.xcprivacy")
+            ],
             swiftSettings: [
                 .swiftLanguageMode(.v6)
             ]

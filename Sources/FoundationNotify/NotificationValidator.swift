@@ -1,5 +1,6 @@
 import Foundation
 
+/// Validates notification drafts and triggers before scheduling.
 public struct NotificationValidator: Sendable {
     public init() {}
 
@@ -47,6 +48,30 @@ public struct NotificationValidator: Sendable {
 
         if draft.body.count > constraints.maxBodyLength {
             issues.append(.bodyTooLong(max: constraints.maxBodyLength, actual: draft.body.count))
+        }
+
+        if draft.actions.count > constraints.maxActionCount {
+            issues.append(.tooManyActions(max: constraints.maxActionCount, actual: draft.actions.count))
+        }
+
+        var seenActionIdentifiers: Set<String> = []
+        for (index, action) in draft.actions.enumerated() {
+            let identifier = action.identifier.trimmingCharacters(in: .whitespacesAndNewlines)
+            if identifier.isEmpty {
+                issues.append(.emptyActionIdentifier(index: index))
+            } else if !seenActionIdentifiers.insert(identifier).inserted {
+                issues.append(.duplicateActionIdentifier(identifier))
+            }
+
+            if action.title.count > constraints.maxActionTitleLength {
+                issues.append(
+                    .actionTitleTooLong(
+                        identifier: action.identifier,
+                        max: constraints.maxActionTitleLength,
+                        actual: action.title.count
+                    )
+                )
+            }
         }
 
         let combinedCopy = "\(draft.title)\n\(draft.subtitle ?? "")\n\(draft.body)".localizedLowercase

@@ -14,6 +14,7 @@ FoundationNotify is a Swift Package for generating privacy-preserving local noti
 - Swift-native API for AI-generated local notifications.
 - One-call generation and scheduling from user context, tone, intent, and schedule.
 - Typed `NotificationDraft`, `NotificationTone`, `NotificationIntent`, constraints, triggers, and schedules.
+- Optional structured action buttons via `@Generable` / `UNNotificationCategory`.
 - `NotificationGenerating`, `NotificationScheduling`, and `NotificationAuthorizing` protocols for dependency injection.
 - Validation for empty copy, length limits, forbidden phrases, actionable copy, and invalid schedules.
 - Async/await adapters for `UNUserNotificationCenter`.
@@ -85,7 +86,33 @@ public struct NotificationDraft: Sendable, Codable, Equatable {
     public var categoryIdentifier: String?
     public var threadIdentifier: String?
     public var userInfo: [String: String]
+    public var actions: [NotificationActionDraft]
 }
+```
+
+## Notification Actions
+
+Attach structured quick actions to a draft when the notification should expose system action buttons. If `categoryIdentifier` is nil, `UserNotificationScheduler` generates a unique category identifier, registers a `UNNotificationCategory`, preserves existing categories, and assigns it to the scheduled content.
+
+```swift
+let draft = NotificationDraft(
+    title: "Review time",
+    body: "Review five words now.",
+    categoryIdentifier: "vocabulary-review",
+    actions: [
+        NotificationActionDraft(
+            identifier: "REVIEW_NOW",
+            title: "Review now",
+            options: [.foreground]
+        ),
+        NotificationActionDraft(
+            identifier: "LATER",
+            title: "Later"
+        )
+    ]
+)
+
+try await FoundationNotify.schedule(draft, after: .minutes(10))
 ```
 
 ## Schedule a Draft
@@ -155,6 +182,8 @@ case .denied, .unknown, .unsupported:
 let constraints = NotificationConstraints(
     maxTitleLength: 48,
     maxBodyLength: 140,
+    maxActionCount: 3,
+    maxActionTitleLength: 24,
     forbiddenPhrases: ["limited time", "今すぐ課金"],
     requireActionableCopy: true
 )
@@ -248,7 +277,7 @@ The Foundation Models implementation uses Apple’s on-device Foundation Models 
 
 ## Roadmap
 
-- Richer category/action modeling for notification actions.
+- Additional locale-aware action templates.
 - Additional locale-aware prompt and validation policies.
 - Optional notification preview utilities for SwiftUI apps.
 - More schedule helpers for common reminder patterns.
@@ -259,4 +288,4 @@ CI runs on GitHub Actions with the `macos-15` runner and Xcode 26.3. `swift buil
 
 ## License
 
-License: TBD. The repository does not yet include a `LICENSE` file; choose and add one before publishing the package as a dependency.
+This project is released under the MIT License. See [LICENSE](./LICENSE) for details.

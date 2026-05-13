@@ -1,5 +1,6 @@
 import Foundation
 
+/// A local notification trigger expressed as an interval, date, or repeating calendar match.
 public enum NotificationTrigger: Sendable, Codable, Equatable {
     case timeInterval(TimeInterval, repeats: Bool)
     case date(Date)

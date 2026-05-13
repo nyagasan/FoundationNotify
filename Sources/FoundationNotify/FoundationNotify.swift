@@ -1,5 +1,6 @@
 import Foundation
 
+/// A convenience namespace for generating, validating, authorizing, and scheduling local notifications.
 public enum FoundationNotify {
     public nonisolated(unsafe) static var client: Client = .init(
         generator: FoundationModelsNotificationGenerator(),

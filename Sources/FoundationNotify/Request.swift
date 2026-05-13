@@ -1,4 +1,5 @@
 public extension FoundationNotify {
+    /// Input context and policy for generating a notification draft.
     struct Request: Sendable, Codable, Equatable {
         public var context: String
         public var tone: NotificationTone

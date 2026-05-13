@@ -16,6 +16,13 @@ final class FallbackNotificationGeneratorTests: XCTestCase {
         XCTAssertTrue(draft.body.contains("復習"))
         XCTAssertEqual(draft.categoryIdentifier, "reminder")
         XCTAssertEqual(draft.userInfo["source"], "FoundationNotify")
+        XCTAssertEqual(
+            draft.actions,
+            [
+                NotificationActionDraft(identifier: "REVIEW_NOW", title: "今すぐ確認"),
+                NotificationActionDraft(identifier: "LATER", title: "あとで")
+            ]
+        )
     }
 
     func testFallbackGeneratorRespectsLengthConstraints() async throws {
@@ -31,5 +38,21 @@ final class FallbackNotificationGeneratorTests: XCTestCase {
 
         XCTAssertLessThanOrEqual(draft.title.count, 8)
         XCTAssertLessThanOrEqual(draft.body.count, 12)
+    }
+
+    func testFallbackGeneratorRespectsActionConstraints() async throws {
+        let request = FoundationNotify.Request(
+            context: "Review your vocabulary flashcards now.",
+            tone: .professional,
+            intent: .reminder,
+            locale: "en_US",
+            constraints: NotificationConstraints(maxActionCount: 1, maxActionTitleLength: 6)
+        )
+
+        let draft = try await FallbackNotificationGenerator().generateNotification(for: request)
+
+        XCTAssertEqual(draft.actions, [
+            NotificationActionDraft(identifier: "REVIEW_NOW", title: "Review")
+        ])
     }
 }
