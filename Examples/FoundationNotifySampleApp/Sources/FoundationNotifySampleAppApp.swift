@@ -14,7 +14,7 @@ struct FoundationNotifySampleAppApp: App {
     }
 }
 
-final class ForegroundNotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
+final class ForegroundNotificationDelegate: NSObject, UNUserNotificationCenterDelegate, @unchecked Sendable {
     static let shared = ForegroundNotificationDelegate()
 
     nonisolated func userNotificationCenter(

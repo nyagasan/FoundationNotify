@@ -106,7 +106,7 @@ final class SmartNotificationViewModel {
         case let .generationFailed(message):
             return "generationFailed: \(message)"
         case let .validationFailed(issues):
-            return "validationFailed: \(issues.map(String.init(describing:)).joined(separator: \", \"))"
+            return "validationFailed: \(issues.map(String.init(describing:)).joined(separator: ", "))"
         case .authorizationDenied:
             return "authorizationDenied: enable notifications in Settings and try again."
         case let .schedulingFailed(message):
