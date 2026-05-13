@@ -16,7 +16,7 @@ public struct FoundationModelsNotificationGenerator: NotificationGenerating {
         self.usesFallbackWhenUnavailable = usesFallbackWhenUnavailable
     }
 
-    public func generateNotification(for request: SmartNotificationRequest) async throws -> NotificationDraft {
+    public func generateNotification(for request: FoundationNotify.Request) async throws -> NotificationDraft {
         #if canImport(FoundationModels)
         if #available(iOS 26.0, macOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *) {
             return try await generateWithFoundationModels(for: request)
@@ -28,9 +28,9 @@ public struct FoundationModelsNotificationGenerator: NotificationGenerating {
         #endif
     }
 
-    private func unavailableFallback(for request: SmartNotificationRequest) async throws -> NotificationDraft {
+    private func unavailableFallback(for request: FoundationNotify.Request) async throws -> NotificationDraft {
         guard usesFallbackWhenUnavailable else {
-            throw SmartNotificationError.unsupportedPlatform
+            throw FoundationNotify.Error.unsupportedPlatform
         }
         return try await fallback.generateNotification(for: request)
     }
@@ -39,7 +39,7 @@ public struct FoundationModelsNotificationGenerator: NotificationGenerating {
 #if canImport(FoundationModels)
 @available(iOS 26.0, macOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
 private extension FoundationModelsNotificationGenerator {
-    func generateWithFoundationModels(for request: SmartNotificationRequest) async throws -> NotificationDraft {
+    func generateWithFoundationModels(for request: FoundationNotify.Request) async throws -> NotificationDraft {
         let model = SystemLanguageModel.default
         guard case .available = model.availability else {
             return try await unavailableFallback(for: request)
@@ -62,7 +62,7 @@ private extension FoundationModelsNotificationGenerator {
         return response.content.notificationDraft(for: request)
     }
 
-    func instructions(for request: SmartNotificationRequest) -> String {
+    func instructions(for request: FoundationNotify.Request) -> String {
         """
         You write concise local notification copy for an app.
         Generate only safe, truthful, actionable notification text.
@@ -73,7 +73,7 @@ private extension FoundationModelsNotificationGenerator {
         """
     }
 
-    func prompt(for request: SmartNotificationRequest) -> String {
+    func prompt(for request: FoundationNotify.Request) -> String {
         """
         Context:
         \(request.context)
@@ -113,7 +113,7 @@ private struct GeneratedNotificationDraft: Sendable {
     @Guide(description: "A concise notification body that contains one clear next action.")
     let body: String
 
-    func notificationDraft(for request: SmartNotificationRequest) -> NotificationDraft {
+    func notificationDraft(for request: FoundationNotify.Request) -> NotificationDraft {
         NotificationDraft(
             title: String(title.prefix(request.constraints.maxTitleLength)),
             body: String(body.prefix(request.constraints.maxBodyLength)),

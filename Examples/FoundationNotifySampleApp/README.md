@@ -1,6 +1,6 @@
 # FoundationNotify Sample App
 
-Minimal iOS sample app for validating `FoundationNotify` (`SmartNotifications`) on a real device with Apple Foundation Models.
+Minimal iOS sample app for validating `FoundationNotify` on a real device with Apple Foundation Models.
 
 ## Requirements
 

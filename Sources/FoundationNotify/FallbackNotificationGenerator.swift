@@ -3,7 +3,7 @@ import Foundation
 public struct FallbackNotificationGenerator: NotificationGenerating {
     public init() {}
 
-    public func generateNotification(for request: SmartNotificationRequest) async throws -> NotificationDraft {
+    public func generateNotification(for request: FoundationNotify.Request) async throws -> NotificationDraft {
         let title = title(for: request)
         let body = body(for: request)
 
@@ -24,7 +24,7 @@ public struct FallbackNotificationGenerator: NotificationGenerating {
         return draft
     }
 
-    private func title(for request: SmartNotificationRequest) -> String {
+    private func title(for request: FoundationNotify.Request) -> String {
         switch request.intent {
         case .reminder:
             return localized(request, japanese: "そろそろリマインド", english: "Time for a reminder")
@@ -41,7 +41,7 @@ public struct FallbackNotificationGenerator: NotificationGenerating {
         }
     }
 
-    private func body(for request: SmartNotificationRequest) -> String {
+    private func body(for request: FoundationNotify.Request) -> String {
         let context = normalizedContext(request.context)
         let prefix: String
 
@@ -71,7 +71,7 @@ public struct FallbackNotificationGenerator: NotificationGenerating {
         return trimmed
     }
 
-    private func localized(_ request: SmartNotificationRequest, japanese: String, english: String) -> String {
+    private func localized(_ request: FoundationNotify.Request, japanese: String, english: String) -> String {
         guard let identifier = request.locale?.rawValue.localizedLowercase else {
             return english
         }

@@ -13,20 +13,20 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "SmartNotifications",
-            targets: ["SmartNotifications"]
+            name: "FoundationNotify",
+            targets: ["FoundationNotify"]
         )
     ],
     targets: [
         .target(
-            name: "SmartNotifications",
+            name: "FoundationNotify",
             swiftSettings: [
                 .swiftLanguageMode(.v6)
             ]
         ),
         .testTarget(
-            name: "SmartNotificationsTests",
-            dependencies: ["SmartNotifications"],
+            name: "FoundationNotifyTests",
+            dependencies: ["FoundationNotify"],
             swiftSettings: [
                 .swiftLanguageMode(.v6)
             ]

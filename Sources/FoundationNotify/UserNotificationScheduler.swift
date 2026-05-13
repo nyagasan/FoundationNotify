@@ -22,7 +22,7 @@ public struct UserNotificationScheduler: NotificationScheduling, @unchecked Send
             try await center.add(request)
             return identifier
         } catch {
-            throw SmartNotificationError.schedulingFailed(String(describing: error))
+            throw FoundationNotify.Error.schedulingFailed(String(describing: error))
         }
     }
 
@@ -63,7 +63,7 @@ public struct UserNotificationScheduler: NotificationScheduling {
     public init() {}
 
     public func schedule(_ draft: NotificationDraft, trigger: NotificationTrigger) async throws -> String {
-        throw SmartNotificationError.unsupportedPlatform
+        throw FoundationNotify.Error.unsupportedPlatform
     }
 }
 #endif

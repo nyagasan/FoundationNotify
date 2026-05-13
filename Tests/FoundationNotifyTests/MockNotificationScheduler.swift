@@ -1,5 +1,5 @@
 import Foundation
-@testable import SmartNotifications
+@testable import FoundationNotify
 
 actor MockNotificationScheduler: NotificationScheduling {
     private(set) var scheduled: [(draft: NotificationDraft, trigger: NotificationTrigger)] = []
@@ -14,7 +14,7 @@ actor MockNotificationScheduler: NotificationScheduling {
 struct MockNotificationGenerator: NotificationGenerating {
     var draft: NotificationDraft
 
-    func generateNotification(for request: SmartNotificationRequest) async throws -> NotificationDraft {
+    func generateNotification(for request: FoundationNotify.Request) async throws -> NotificationDraft {
         draft
     }
 }

@@ -12,7 +12,7 @@ public struct UserNotificationAuthorizationClient: NotificationAuthorizing, @unc
         do {
             return try await center.requestAuthorization(options: options.userNotificationOptions)
         } catch {
-            throw SmartNotificationError.schedulingFailed(String(describing: error))
+            throw FoundationNotify.Error.schedulingFailed(String(describing: error))
         }
     }
 
@@ -61,7 +61,7 @@ public struct UserNotificationAuthorizationClient: NotificationAuthorizing {
     public init() {}
 
     public func requestAuthorization(options: NotificationAuthorizationOptions = .default) async throws -> Bool {
-        throw SmartNotificationError.unsupportedPlatform
+        throw FoundationNotify.Error.unsupportedPlatform
     }
 
     public func authorizationStatus() async -> NotificationAuthorizationStatus {

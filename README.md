@@ -30,7 +30,7 @@ Add the package to your Swift Package dependencies:
 Then add the product to your target:
 
 ```swift
-.product(name: "SmartNotifications", package: "FoundationNotify")
+.product(name: "FoundationNotify", package: "FoundationNotify")
 ```
 
 ## Requirements
@@ -46,9 +46,9 @@ Then add the product to your target:
 Request notification permission first:
 
 ```swift
-import SmartNotifications
+import FoundationNotify
 
-let granted = try await SmartNotification.requestAuthorization()
+let granted = try await FoundationNotify.requestAuthorization()
 guard granted else {
     return
 }
@@ -57,7 +57,7 @@ guard granted else {
 Generate and schedule a local notification in one call:
 
 ```swift
-try await SmartNotification.schedule(
+try await FoundationNotify.schedule(
     after: .minutes(30),
     context: "ユーザーは英単語学習中。復習を促したい。",
     tone: .friendly,
@@ -68,7 +68,7 @@ try await SmartNotification.schedule(
 ## Generate Only
 
 ```swift
-let draft = try await SmartNotification.generate(
+let draft = try await FoundationNotify.generate(
     context: "ユーザーは英単語学習中。復習を促したい。",
     tone: .friendly,
     intent: .reminder
@@ -91,13 +91,13 @@ public struct NotificationDraft: Sendable, Codable, Equatable {
 ## Schedule a Draft
 
 ```swift
-let draft = try await SmartNotification.generate(
+let draft = try await FoundationNotify.generate(
     context: "明日の朝、ユーザーに散歩を促したい。",
     tone: .gentle,
     intent: .habit
 )
 
-try await SmartNotification.schedule(
+try await FoundationNotify.schedule(
     draft,
     at: Date().addingTimeInterval(30 * 60)
 )
@@ -106,7 +106,7 @@ try await SmartNotification.schedule(
 ## Schedule at a Date
 
 ```swift
-try await SmartNotification.schedule(
+try await FoundationNotify.schedule(
     at: someDate,
     context: "明日の朝、ユーザーに散歩を促したい。",
     tone: .gentle,
@@ -117,7 +117,7 @@ try await SmartNotification.schedule(
 ## Repeating Schedule
 
 ```swift
-try await SmartNotification.schedule(
+try await FoundationNotify.schedule(
     repeating: .daily(hour: 8, minute: 0),
     context: "朝の英単語復習を促す",
     tone: .friendly,
@@ -128,7 +128,7 @@ try await SmartNotification.schedule(
 You can also use weekly, monthly, or custom `DateComponents` schedules:
 
 ```swift
-try await SmartNotification.schedule(
+try await FoundationNotify.schedule(
     draft,
     repeating: .weekly(weekday: 2, hour: 9, minute: 30)
 )
@@ -137,13 +137,13 @@ try await SmartNotification.schedule(
 ## Authorization Status
 
 ```swift
-let status = await SmartNotification.authorizationStatus()
+let status = await FoundationNotify.authorizationStatus()
 
 switch status {
 case .authorized, .provisional, .ephemeral:
     break
 case .notDetermined:
-    _ = try await SmartNotification.requestAuthorization()
+    _ = try await FoundationNotify.requestAuthorization()
 case .denied, .unknown, .unsupported:
     break
 }
@@ -159,7 +159,7 @@ let constraints = NotificationConstraints(
     requireActionableCopy: true
 )
 
-try await SmartNotification.schedule(
+try await FoundationNotify.schedule(
     after: .minutes(10),
     context: "短い復習セッションを促したい。",
     tone: .calm,
@@ -168,15 +168,15 @@ try await SmartNotification.schedule(
 )
 ```
 
-Validation failures are returned as `SmartNotificationError.validationFailed`.
+Validation failures are returned as `FoundationNotify.Error.validationFailed`.
 
 ## Dependency Injection
 
-Use `SmartNotificationClient` when you want explicit dependencies, tests, or a custom Foundation Models generator.
+Use `FoundationNotify.Client` when you want explicit dependencies, tests, or a custom Foundation Models generator.
 
 ```swift
 struct MockGenerator: NotificationGenerating {
-    func generateNotification(for request: SmartNotificationRequest) async throws -> NotificationDraft {
+    func generateNotification(for request: FoundationNotify.Request) async throws -> NotificationDraft {
         NotificationDraft(
             title: "Review time",
             body: "Review five words now.",
@@ -185,7 +185,7 @@ struct MockGenerator: NotificationGenerating {
     }
 }
 
-let client = SmartNotificationClient(
+let client = FoundationNotify.Client(
     generator: MockGenerator(),
     scheduler: UserNotificationScheduler(),
     authorizer: UserNotificationAuthorizationClient()
@@ -211,12 +211,12 @@ The generator checks model availability before creating a response. If Foundatio
 // Default: auto-fallback when the on-device model is unavailable.
 let generator = FoundationModelsNotificationGenerator()
 
-// Strict mode: throw SmartNotificationError.unsupportedPlatform instead of falling back.
+// Strict mode: throw FoundationNotify.Error.unsupportedPlatform instead of falling back.
 let strict = FoundationModelsNotificationGenerator(
     usesFallbackWhenUnavailable: false
 )
 
-let client = SmartNotificationClient(
+let client = FoundationNotify.Client(
     generator: strict,
     scheduler: UserNotificationScheduler(),
     authorizer: UserNotificationAuthorizationClient()

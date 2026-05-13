@@ -1,10 +1,10 @@
 import Foundation
 import XCTest
-@testable import SmartNotifications
+@testable import FoundationNotify
 
-final class SmartNotificationTests: XCTestCase {
+final class FoundationNotifyTests: XCTestCase {
     func testGenerateValidatesDraft() async throws {
-        let client = SmartNotificationClient(
+        let client = FoundationNotify.Client(
             generator: MockNotificationGenerator(
                 draft: NotificationDraft(title: "Review", body: "Review five words now.")
             ),
@@ -23,7 +23,7 @@ final class SmartNotificationTests: XCTestCase {
 
     func testScheduleGeneratedDraftAfterInterval() async throws {
         let scheduler = MockNotificationScheduler()
-        let client = SmartNotificationClient(
+        let client = FoundationNotify.Client(
             generator: MockNotificationGenerator(
                 draft: NotificationDraft(title: "Review", body: "Review five words now.")
             ),
@@ -46,7 +46,7 @@ final class SmartNotificationTests: XCTestCase {
 
     func testScheduleDraftAtDate() async throws {
         let scheduler = MockNotificationScheduler()
-        let client = SmartNotificationClient(
+        let client = FoundationNotify.Client(
             generator: MockNotificationGenerator(
                 draft: NotificationDraft(title: "Unused", body: "Review now.")
             ),
@@ -67,7 +67,7 @@ final class SmartNotificationTests: XCTestCase {
 
     func testRepeatingScheduleUsesCalendarTrigger() async throws {
         let scheduler = MockNotificationScheduler()
-        let client = SmartNotificationClient(
+        let client = FoundationNotify.Client(
             generator: MockNotificationGenerator(
                 draft: NotificationDraft(title: "Morning review", body: "Review words now.")
             ),
@@ -92,7 +92,7 @@ final class SmartNotificationTests: XCTestCase {
     }
 
     func testAuthorizationDelegatesToAuthorizer() async throws {
-        let client = SmartNotificationClient(
+        let client = FoundationNotify.Client(
             generator: MockNotificationGenerator(
                 draft: NotificationDraft(title: "Review", body: "Review now.")
             ),
