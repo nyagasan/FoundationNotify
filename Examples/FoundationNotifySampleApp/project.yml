@@ -1,0 +1,36 @@
+name: FoundationNotifySampleApp
+options:
+  bundleIdPrefix: com.example.foundationnotify
+  deploymentTarget:
+    iOS: "26.0"
+settings:
+  SWIFT_VERSION: "6"
+  CODE_SIGN_STYLE: Automatic
+  DEVELOPMENT_TEAM: ""
+packages:
+  FoundationNotify:
+    path: ../..
+targets:
+  FoundationNotifySampleApp:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    dependencies:
+      - package: FoundationNotify
+        product: SmartNotifications
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.example.foundationnotify.sample
+      TARGETED_DEVICE_FAMILY: "1"
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: FoundationNotify Sample
+        LSRequiresIPhoneOS: true
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
