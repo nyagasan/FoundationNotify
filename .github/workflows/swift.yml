@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-test:
-    name: Build & Test (Xcode 26)
+    name: Build & Test (Xcode 26 / iOS 26 Simulator)
     runs-on: macos-15
     steps:
       - name: Checkout
@@ -27,9 +27,25 @@ jobs:
         run: |
           swift --version
           xcodebuild -version
+          xcrun simctl list runtimes | grep -E 'iOS' || true
 
-      - name: Swift build
+      - name: Swift build (compile check)
         run: swift build -Xswiftc -warnings-as-errors
 
-      - name: Swift test
-        run: swift test -Xswiftc -warnings-as-errors
+      - name: Discover scheme
+        id: scheme
+        run: |
+          set -euo pipefail
+          xcodebuild -list
+          SCHEME="$(xcodebuild -list | awk '/Schemes:/{f=1;next} f && NF{print $1; exit}')"
+          echo "Using scheme: $SCHEME"
+          echo "scheme=$SCHEME" >> "$GITHUB_OUTPUT"
+
+      - name: Run tests on iOS 26 Simulator
+        run: |
+          set -euo pipefail
+          xcodebuild test \
+            -scheme "${{ steps.scheme.outputs.scheme }}" \
+            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16' \
+            -skipMacroValidation \
+            CODE_SIGNING_ALLOWED=NO
