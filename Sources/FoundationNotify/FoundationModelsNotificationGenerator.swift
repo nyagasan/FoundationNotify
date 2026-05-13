@@ -4,6 +4,7 @@ import Foundation
 import FoundationModels
 #endif
 
+/// Generates notification drafts with Apple Foundation Models and falls back when unavailable.
 public struct FoundationModelsNotificationGenerator: NotificationGenerating {
     private let fallback: any NotificationGenerating
     private let usesFallbackWhenUnavailable: Bool
@@ -81,7 +82,7 @@ private extension FoundationModelsNotificationGenerator {
         Tone: \(request.tone.rawValue)
         Intent: \(request.intent.rawValue)
 
-        Return a notification title and body. The body must suggest one clear next action.
+        Return a notification title, body, and up to \(request.constraints.maxActionCount) optional quick action buttons. The body must suggest one clear next action.
         """
     }
 
@@ -105,13 +106,29 @@ private extension FoundationModelsNotificationGenerator {
 }
 
 @available(iOS 26.0, macOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-@Generable(description: "A concise local notification draft")
+@Generable(description: "A single notification action button")
+private struct GeneratedAction: Sendable {
+    @Guide(description: "A short uppercase snake_case identifier, e.g. REVIEW_NOW")
+    let identifier: String
+
+    @Guide(description: "A short user-facing button label.")
+    let title: String
+
+    @Guide(description: "Whether this action opens the app in the foreground.")
+    let foreground: Bool
+}
+
+@available(iOS 26.0, macOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+@Generable(description: "A concise local notification draft with optional quick actions")
 private struct GeneratedNotificationDraft: Sendable {
     @Guide(description: "A short notification title.")
     let title: String
 
     @Guide(description: "A concise notification body that contains one clear next action.")
     let body: String
+
+    @Guide(description: "Up to 3 quick action buttons. Empty list is acceptable.")
+    let actions: [GeneratedAction]
 
     func notificationDraft(for request: FoundationNotify.Request) -> NotificationDraft {
         NotificationDraft(
@@ -124,7 +141,20 @@ private struct GeneratedNotificationDraft: Sendable {
                 "generator": "FoundationModels",
                 "intent": request.intent.rawValue,
                 "tone": request.tone.rawValue
-            ]
+            ],
+            actions: actions
+                .prefix(max(0, request.constraints.maxActionCount))
+                .map { action in
+                    var options: NotificationActionDraft.Options = []
+                    if action.foreground {
+                        options.insert(.foreground)
+                    }
+                    return NotificationActionDraft(
+                        identifier: action.identifier,
+                        title: String(action.title.prefix(request.constraints.maxActionTitleLength)),
+                        options: options
+                    )
+                }
         )
     }
 }

@@ -1,3 +1,4 @@
+/// Requests and reads local notification authorization state.
 public protocol NotificationAuthorizing: Sendable {
     func requestAuthorization(options: NotificationAuthorizationOptions) async throws -> Bool
     func authorizationStatus() async -> NotificationAuthorizationStatus

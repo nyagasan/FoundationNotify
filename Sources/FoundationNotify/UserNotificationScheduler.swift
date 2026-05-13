@@ -3,6 +3,7 @@ import Foundation
 #if canImport(UserNotifications)
 @preconcurrency import UserNotifications
 
+/// Schedules local notifications through `UNUserNotificationCenter`.
 public struct UserNotificationScheduler: NotificationScheduling, @unchecked Sendable {
     private let center: UNUserNotificationCenter
 
@@ -12,13 +13,14 @@ public struct UserNotificationScheduler: NotificationScheduling, @unchecked Send
 
     public func schedule(_ draft: NotificationDraft, trigger: NotificationTrigger) async throws -> String {
         let identifier = UUID().uuidString
-        let request = UNNotificationRequest(
-            identifier: identifier,
-            content: makeContent(from: draft),
-            trigger: try makeTrigger(from: trigger)
-        )
 
         do {
+            let categoryIdentifier = try await registerCategoryIfNeeded(for: draft)
+            let request = UNNotificationRequest(
+                identifier: identifier,
+                content: makeContent(from: draft, categoryIdentifier: categoryIdentifier),
+                trigger: try makeTrigger(from: trigger)
+            )
             try await center.add(request)
             return identifier
         } catch {
@@ -26,14 +28,14 @@ public struct UserNotificationScheduler: NotificationScheduling, @unchecked Send
         }
     }
 
-    private func makeContent(from draft: NotificationDraft) -> UNMutableNotificationContent {
+    private func makeContent(from draft: NotificationDraft, categoryIdentifier: String?) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
         content.title = draft.title
         content.body = draft.body
         if let subtitle = draft.subtitle {
             content.subtitle = subtitle
         }
-        if let categoryIdentifier = draft.categoryIdentifier {
+        if let categoryIdentifier {
             content.categoryIdentifier = categoryIdentifier
         }
         if let threadIdentifier = draft.threadIdentifier {
@@ -41,6 +43,33 @@ public struct UserNotificationScheduler: NotificationScheduling, @unchecked Send
         }
         content.userInfo = draft.userInfo
         return content
+    }
+
+    private func registerCategoryIfNeeded(for draft: NotificationDraft) async throws -> String? {
+        guard !draft.actions.isEmpty else {
+            return draft.categoryIdentifier
+        }
+
+        let categoryIdentifier = draft.categoryIdentifier ?? "foundation-notify-\(UUID().uuidString)"
+        let actions = draft.actions.map { action in
+            UNNotificationAction(
+                identifier: action.identifier,
+                title: action.title,
+                options: action.options.userNotificationActionOptions
+            )
+        }
+        let category = UNNotificationCategory(
+            identifier: categoryIdentifier,
+            actions: actions,
+            intentIdentifiers: [],
+            options: []
+        )
+
+        let existingCategories = await center.notificationCategories()
+        var categories = Set(existingCategories.filter { $0.identifier != categoryIdentifier })
+        categories.insert(category)
+        center.setNotificationCategories(categories)
+        return categoryIdentifier
     }
 
     private func makeTrigger(from trigger: NotificationTrigger) throws -> UNNotificationTrigger {
@@ -58,7 +87,24 @@ public struct UserNotificationScheduler: NotificationScheduling, @unchecked Send
         }
     }
 }
+
+private extension NotificationActionDraft.Options {
+    var userNotificationActionOptions: UNNotificationActionOptions {
+        var options: UNNotificationActionOptions = []
+        if contains(.foreground) {
+            options.insert(.foreground)
+        }
+        if contains(.destructive) {
+            options.insert(.destructive)
+        }
+        if contains(.authenticationRequired) {
+            options.insert(.authenticationRequired)
+        }
+        return options
+    }
+}
 #else
+/// A placeholder scheduler for platforms where UserNotifications cannot be imported.
 public struct UserNotificationScheduler: NotificationScheduling {
     public init() {}
 

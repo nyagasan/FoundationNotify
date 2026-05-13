@@ -1,6 +1,7 @@
 #if canImport(UserNotifications)
 @preconcurrency import UserNotifications
 
+/// Requests local notification authorization through `UNUserNotificationCenter`.
 public struct UserNotificationAuthorizationClient: NotificationAuthorizing, @unchecked Sendable {
     private let center: UNUserNotificationCenter
 
@@ -57,6 +58,7 @@ private extension NotificationAuthorizationStatus {
     }
 }
 #else
+/// A placeholder authorizer for platforms where UserNotifications cannot be imported.
 public struct UserNotificationAuthorizationClient: NotificationAuthorizing {
     public init() {}
 

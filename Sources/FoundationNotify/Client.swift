@@ -1,6 +1,7 @@
 import Foundation
 
 public extension FoundationNotify {
+    /// A configurable facade that wires generation, scheduling, authorization, and validation dependencies.
     struct Client: Sendable {
         public var generator: any NotificationGenerating
         public var scheduler: any NotificationScheduling

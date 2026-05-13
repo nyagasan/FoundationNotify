@@ -45,6 +45,64 @@ final class NotificationValidatorTests: XCTestCase {
         }
     }
 
+    func testTooManyActionsFails() {
+        let draft = NotificationDraft(
+            title: "Review time",
+            body: "Review five words now.",
+            actions: [
+                NotificationActionDraft(identifier: "ONE", title: "One"),
+                NotificationActionDraft(identifier: "TWO", title: "Two")
+            ]
+        )
+        let constraints = NotificationConstraints(maxActionCount: 1)
+
+        XCTAssertThrowsError(try NotificationValidator().validate(draft, constraints: constraints)) { error in
+            XCTAssertEqual(error as? FoundationNotify.Error, .validationFailed([.tooManyActions(max: 1, actual: 2)]))
+        }
+    }
+
+    func testInvalidActionIdentifiersFail() {
+        let draft = NotificationDraft(
+            title: "Review time",
+            body: "Review five words now.",
+            actions: [
+                NotificationActionDraft(identifier: "REVIEW_NOW", title: "Review now"),
+                NotificationActionDraft(identifier: " ", title: "Later"),
+                NotificationActionDraft(identifier: "REVIEW_NOW", title: "Again")
+            ]
+        )
+
+        XCTAssertThrowsError(try NotificationValidator().validate(draft)) { error in
+            XCTAssertEqual(
+                error as? FoundationNotify.Error,
+                .validationFailed([
+                    .emptyActionIdentifier(index: 1),
+                    .duplicateActionIdentifier("REVIEW_NOW")
+                ])
+            )
+        }
+    }
+
+    func testActionTitleTooLongFails() {
+        let draft = NotificationDraft(
+            title: "Review time",
+            body: "Review five words now.",
+            actions: [
+                NotificationActionDraft(identifier: "REVIEW_NOW", title: "Review now")
+            ]
+        )
+        let constraints = NotificationConstraints(maxActionTitleLength: 4)
+
+        XCTAssertThrowsError(try NotificationValidator().validate(draft, constraints: constraints)) { error in
+            XCTAssertEqual(
+                error as? FoundationNotify.Error,
+                .validationFailed([
+                    .actionTitleTooLong(identifier: "REVIEW_NOW", max: 4, actual: 10)
+                ])
+            )
+        }
+    }
+
     func testPastDateTriggerFails() {
         let now = Date(timeIntervalSince1970: 1_000)
         let trigger = NotificationTrigger.date(Date(timeIntervalSince1970: 999))

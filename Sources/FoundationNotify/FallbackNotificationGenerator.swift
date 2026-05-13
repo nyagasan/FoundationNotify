@@ -1,5 +1,6 @@
 import Foundation
 
+/// Generates deterministic notification drafts for tests and unsupported Foundation Models environments.
 public struct FallbackNotificationGenerator: NotificationGenerating {
     public init() {}
 
@@ -16,11 +17,21 @@ public struct FallbackNotificationGenerator: NotificationGenerating {
                 "source": "FoundationNotify",
                 "intent": request.intent.rawValue,
                 "tone": request.tone.rawValue
-            ]
+            ],
+            actions: actions(for: request)
         )
 
         draft.title = String(draft.title.prefix(request.constraints.maxTitleLength))
         draft.body = String(draft.body.prefix(request.constraints.maxBodyLength))
+        draft.actions = draft.actions
+            .prefix(max(0, request.constraints.maxActionCount))
+            .map {
+                NotificationActionDraft(
+                    identifier: $0.identifier,
+                    title: String($0.title.prefix(request.constraints.maxActionTitleLength)),
+                    options: $0.options
+                )
+            }
         return draft
     }
 
@@ -69,6 +80,38 @@ public struct FallbackNotificationGenerator: NotificationGenerating {
             return "Open the app and take the next step."
         }
         return trimmed
+    }
+
+    private func actions(for request: FoundationNotify.Request) -> [NotificationActionDraft] {
+        switch request.intent {
+        case .reminder:
+            return [
+                NotificationActionDraft(identifier: "REVIEW_NOW", title: localized(request, japanese: "今すぐ確認", english: "Review now")),
+                NotificationActionDraft(identifier: "LATER", title: localized(request, japanese: "あとで", english: "Later"))
+            ]
+        case .habit:
+            return [
+                NotificationActionDraft(identifier: "START_NOW", title: localized(request, japanese: "始める", english: "Start now"), options: [.foreground]),
+                NotificationActionDraft(identifier: "SKIP_TODAY", title: localized(request, japanese: "今日はスキップ", english: "Skip today"))
+            ]
+        case .learning:
+            return [
+                NotificationActionDraft(identifier: "PRACTICE_NOW", title: localized(request, japanese: "練習する", english: "Practice now"), options: [.foreground])
+            ]
+        case .wellness:
+            return [
+                NotificationActionDraft(identifier: "TAKE_PAUSE", title: localized(request, japanese: "ひと休み", english: "Take a pause"))
+            ]
+        case .productivity:
+            return [
+                NotificationActionDraft(identifier: "OPEN_TASK", title: localized(request, japanese: "タスクを開く", english: "Open task"), options: [.foreground])
+            ]
+        case .event:
+            return [
+                NotificationActionDraft(identifier: "VIEW_EVENT", title: localized(request, japanese: "予定を見る", english: "View event"), options: [.foreground]),
+                NotificationActionDraft(identifier: "SNOOZE", title: localized(request, japanese: "少し後で", english: "Snooze"))
+            ]
+        }
     }
 
     private func localized(_ request: FoundationNotify.Request, japanese: String, english: String) -> String {
