@@ -1,5 +1,10 @@
 # FoundationNotify
 
+[![Swift](https://github.com/nyagasan/FoundationNotify/actions/workflows/swift.yml/badge.svg?branch=main)](https://github.com/nyagasan/FoundationNotify/actions/workflows/swift.yml)
+![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange.svg)
+![Xcode 26](https://img.shields.io/badge/Xcode-26-1575F9.svg)
+![Platforms](https://img.shields.io/badge/platforms-iOS%2026%20%7C%20macOS%2026%20%7C%20watchOS%2026%20%7C%20tvOS%2026%20%7C%20visionOS%2026-lightgrey.svg)
+
 AI-generated local notifications powered by Apple Foundation Models.
 
 FoundationNotify is a Swift Package for generating privacy-preserving local notification copy on device and scheduling it with `UNUserNotificationCenter`. It targets Local Notifications only. It does not send remote Push Notifications, does not integrate with APNs, and does not require a notification server.
@@ -200,7 +205,32 @@ For unit tests, provide a mock `NotificationScheduling` implementation so tests 
 
 `FoundationModelsNotificationGenerator` uses the WWDC25 GA Foundation Models API surface: `SystemLanguageModel.default.availability`, `LanguageModelSession`, guided structured generation with `@Generable` and `@Guide`, and `respond(to:generating:includeSchemaInPrompt:options:)`.
 
-The generator checks model availability before creating a response. If Foundation Models cannot be imported, the OS is below the supported availability, or `SystemLanguageModel` is unavailable at runtime, it delegates to `FallbackNotificationGenerator` by default. Pass `usesFallbackWhenUnavailable: false` if you prefer `SmartNotificationError.unsupportedPlatform`.
+The generator checks model availability before creating a response. If Foundation Models cannot be imported, the OS is below the supported availability, or `SystemLanguageModel` is unavailable at runtime, it delegates to `FallbackNotificationGenerator` by default.
+
+```swift
+// Default: auto-fallback when the on-device model is unavailable.
+let generator = FoundationModelsNotificationGenerator()
+
+// Strict mode: throw SmartNotificationError.unsupportedPlatform instead of falling back.
+let strict = FoundationModelsNotificationGenerator(
+    usesFallbackWhenUnavailable: false
+)
+
+let client = SmartNotificationClient(
+    generator: strict,
+    scheduler: UserNotificationScheduler(),
+    authorizer: UserNotificationAuthorizationClient()
+)
+```
+
+You can also inject a custom fallback (for example, a server-backed generator behind a feature flag):
+
+```swift
+let generator = FoundationModelsNotificationGenerator(
+    fallback: MyRemoteGenerator(),
+    usesFallbackWhenUnavailable: true
+)
+```
 
 ## Privacy
 
@@ -222,3 +252,11 @@ The Foundation Models implementation uses Apple’s on-device Foundation Models 
 - Additional locale-aware prompt and validation policies.
 - Optional notification preview utilities for SwiftUI apps.
 - More schedule helpers for common reminder patterns.
+
+## Continuous Integration
+
+CI runs on GitHub Actions with the `macos-15` runner and Xcode 26.3. `swift build` is invoked with `-warnings-as-errors` to catch Swift 6 strict-concurrency regressions, and the test suite runs on the iOS 26 Simulator (the runner host is still macOS 15 and cannot dlopen `FoundationModels.framework`, which only ships in macOS 26 / iOS 26 SDKs). See `.github/workflows/swift.yml`.
+
+## License
+
+License: TBD. The repository does not yet include a `LICENSE` file; choose and add one before publishing the package as a dependency.
