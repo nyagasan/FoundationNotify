@@ -7,7 +7,7 @@ import Foundation
 public actor UserNotificationScheduler: NotificationScheduling {
     private let center: UNUserNotificationCenter
 
-    nonisolated public init(center: UNUserNotificationCenter = .current()) {
+    public init(center: UNUserNotificationCenter = .current()) {
         self.center = center
     }
 
