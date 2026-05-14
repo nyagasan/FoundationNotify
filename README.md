@@ -285,7 +285,7 @@ The Foundation Models implementation uses Apple’s on-device Foundation Models 
 
 ## Continuous Integration
 
-CI runs on GitHub Actions with the `macos-15` runner and Xcode 26.3. `swift build` is invoked with `-warnings-as-errors` to catch Swift 6 strict-concurrency regressions, and the test suite runs on the iOS 26 Simulator (the runner host is still macOS 15 and cannot dlopen `FoundationModels.framework`, which only ships in macOS 26 / iOS 26 SDKs). See `.github/workflows/swift.yml`.
+CI runs on GitHub Actions with the `macos-26` runner using the image's default Xcode 26. `swift build` is invoked with `-warnings-as-errors` to catch Swift 6 strict-concurrency regressions. Tests run twice for fast feedback and platform fidelity: `swift test` runs the mock-backed suite directly on the macOS 26 host (where `FoundationModels.framework` is available natively), and `xcodebuild test` runs the full suite on the iOS 26 Simulator (`iPhone 17`). See `.github/workflows/swift.yml`.
 
 ## License
 
