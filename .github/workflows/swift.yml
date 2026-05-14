@@ -49,6 +49,6 @@ jobs:
           set -euo pipefail
           xcodebuild test \
             -scheme "${{ steps.scheme.outputs.scheme }}" \
-            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16' \
+            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 17' \
             -skipMacroValidation \
             CODE_SIGNING_ALLOWED=NO
