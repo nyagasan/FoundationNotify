@@ -38,9 +38,10 @@ Then add the product to your target:
 
 - Xcode 26 or later.
 - Swift 6 language mode.
-- iOS 26+, macOS 26+, watchOS 26+, tvOS 26+, or visionOS 26+.
+- iOS 26+, macOS 26+, watchOS 26+, tvOS 26+, or visionOS 26+ to build and schedule local notifications.
 - `UserNotifications` for real scheduling.
-- Apple Foundation Models on iOS 26 and sibling OS releases. Runtime model availability still depends on Apple Intelligence support, user settings, and model readiness.
+- Apple Foundation Models for on-device generation: **iOS 26+, macOS 26+, or visionOS 26+**. Apple ships the framework with `@available(watchOS, unavailable)` and `@available(tvOS, unavailable)`; on those two platforms FoundationNotify builds successfully and uses `FallbackNotificationGenerator` (deterministic, no AI).
+- An Apple Intelligence–capable device (iPhone 15 Pro, iPhone 16 series or later, M-series iPad or Mac, or Apple Vision Pro), with Apple Intelligence enabled and the on-device model downloaded. Runtime model availability still depends on user settings, the device's system language, and model readiness.
 
 ## Quick Start
 
@@ -60,7 +61,7 @@ Generate and schedule a local notification in one call:
 ```swift
 try await FoundationNotify.schedule(
     after: .minutes(30),
-    context: "ユーザーは英単語学習中。復習を促したい。",
+    context: "User just finished a vocabulary lesson and might benefit from a review.",
     tone: .friendly,
     intent: .reminder
 )
@@ -70,7 +71,7 @@ try await FoundationNotify.schedule(
 
 ```swift
 let draft = try await FoundationNotify.generate(
-    context: "ユーザーは英単語学習中。復習を促したい。",
+    context: "User just finished a vocabulary lesson and might benefit from a review.",
     tone: .friendly,
     intent: .reminder
 )
@@ -119,7 +120,7 @@ try await FoundationNotify.schedule(draft, after: .minutes(10))
 
 ```swift
 let draft = try await FoundationNotify.generate(
-    context: "明日の朝、ユーザーに散歩を促したい。",
+    context: "Encourage the user to take a short walk tomorrow morning.",
     tone: .gentle,
     intent: .habit
 )
@@ -135,7 +136,7 @@ try await FoundationNotify.schedule(
 ```swift
 try await FoundationNotify.schedule(
     at: someDate,
-    context: "明日の朝、ユーザーに散歩を促したい。",
+    context: "Encourage the user to take a short walk tomorrow morning.",
     tone: .gentle,
     intent: .habit
 )
@@ -146,7 +147,7 @@ try await FoundationNotify.schedule(
 ```swift
 try await FoundationNotify.schedule(
     repeating: .daily(hour: 8, minute: 0),
-    context: "朝の英単語復習を促す",
+    context: "Daily morning vocabulary review reminder.",
     tone: .friendly,
     intent: .reminder
 )
@@ -184,13 +185,13 @@ let constraints = NotificationConstraints(
     maxBodyLength: 140,
     maxActionCount: 3,
     maxActionTitleLength: 24,
-    forbiddenPhrases: ["limited time", "今すぐ課金"],
+    forbiddenPhrases: ["limited time", "buy now"],
     requireActionableCopy: true
 )
 
 try await FoundationNotify.schedule(
     after: .minutes(10),
-    context: "短い復習セッションを促したい。",
+    context: "Encourage a short review session.",
     tone: .calm,
     intent: .learning,
     constraints: constraints
