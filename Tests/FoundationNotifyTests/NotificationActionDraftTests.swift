@@ -1,9 +1,9 @@
 import Foundation
-import XCTest
+import Testing
 @testable import FoundationNotify
 
-final class NotificationActionDraftTests: XCTestCase {
-    func testNotificationDraftDecodesWithoutActionsForBackwardCompatibility() throws {
+struct NotificationActionDraftTests {
+    @Test func notificationDraftDecodesWithoutActionsForBackwardCompatibility() throws {
         let data = Data(
             """
             {
@@ -16,10 +16,10 @@ final class NotificationActionDraftTests: XCTestCase {
 
         let draft = try JSONDecoder().decode(NotificationDraft.self, from: data)
 
-        XCTAssertEqual(draft.actions, [])
+        #expect(draft.actions == [])
     }
 
-    func testNotificationConstraintsDecodesActionDefaultsForBackwardCompatibility() throws {
+    @Test func notificationConstraintsDecodesActionDefaultsForBackwardCompatibility() throws {
         let data = Data(
             """
             {
@@ -33,11 +33,11 @@ final class NotificationActionDraftTests: XCTestCase {
 
         let constraints = try JSONDecoder().decode(NotificationConstraints.self, from: data)
 
-        XCTAssertEqual(constraints.maxActionCount, 3)
-        XCTAssertEqual(constraints.maxActionTitleLength, 24)
+        #expect(constraints.maxActionCount == 3)
+        #expect(constraints.maxActionTitleLength == 24)
     }
 
-    func testCodableRoundTripPreservesAction() throws {
+    @Test func codableRoundTripPreservesAction() throws {
         let action = NotificationActionDraft(
             identifier: "REVIEW_NOW",
             title: "Review now",
@@ -47,18 +47,18 @@ final class NotificationActionDraftTests: XCTestCase {
         let data = try JSONEncoder().encode(action)
         let decoded = try JSONDecoder().decode(NotificationActionDraft.self, from: data)
 
-        XCTAssertEqual(decoded, action)
+        #expect(decoded == action)
     }
 
-    func testOptionsBehaveAsOptionSet() {
+    @Test func optionsBehaveAsOptionSet() {
         var options: NotificationActionDraft.Options = [.foreground]
 
-        XCTAssertTrue(options.contains(.foreground))
-        XCTAssertFalse(options.contains(.destructive))
+        #expect(options.contains(.foreground))
+        #expect(!options.contains(.destructive))
 
         options.insert(.destructive)
 
-        XCTAssertTrue(options.contains(.destructive))
-        XCTAssertEqual(options.rawValue, 3)
+        #expect(options.contains(.destructive))
+        #expect(options.rawValue == 3)
     }
 }

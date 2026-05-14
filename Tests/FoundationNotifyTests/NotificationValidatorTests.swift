@@ -1,22 +1,24 @@
 import Foundation
-import XCTest
+import Testing
 @testable import FoundationNotify
 
-final class NotificationValidatorTests: XCTestCase {
-    func testValidDraftPasses() throws {
+struct NotificationValidatorTests {
+    @Test func validDraftPasses() throws {
         let draft = NotificationDraft(title: "Review time", body: "Review five words now.")
-        XCTAssertNoThrow(try NotificationValidator().validate(draft))
+        try NotificationValidator().validate(draft)
     }
 
-    func testEmptyTitleFails() {
+    @Test func emptyTitleFails() {
         let draft = NotificationDraft(title: " ", body: "Review five words now.")
 
-        XCTAssertThrowsError(try NotificationValidator().validate(draft)) { error in
-            XCTAssertEqual(error as? FoundationNotify.Error, .validationFailed([.emptyTitle]))
+        #expect {
+            try NotificationValidator().validate(draft)
+        } throws: { error in
+            error as? FoundationNotify.Error == .validationFailed([.emptyTitle])
         }
     }
 
-    func testLengthAndForbiddenPhraseFailuresAreReportedTogether() {
+    @Test func lengthAndForbiddenPhraseFailuresAreReportedTogether() {
         let draft = NotificationDraft(title: "Too long", body: "Open this spam phrase now.")
         let constraints = NotificationConstraints(
             maxTitleLength: 4,
@@ -25,27 +27,28 @@ final class NotificationValidatorTests: XCTestCase {
             requireActionableCopy: true
         )
 
-        XCTAssertThrowsError(try NotificationValidator().validate(draft, constraints: constraints)) { error in
-            XCTAssertEqual(
-                error as? FoundationNotify.Error,
-                .validationFailed([
+        #expect {
+            try NotificationValidator().validate(draft, constraints: constraints)
+        } throws: { error in
+            error as? FoundationNotify.Error == .validationFailed([
                     .titleTooLong(max: 4, actual: 8),
                     .bodyTooLong(max: 10, actual: 26),
                     .containsForbiddenPhrase("spam phrase")
                 ])
-            )
         }
     }
 
-    func testMissingActionableCopyFailsWhenRequired() {
+    @Test func missingActionableCopyFailsWhenRequired() {
         let draft = NotificationDraft(title: "Quiet note", body: "A short neutral sentence.")
 
-        XCTAssertThrowsError(try NotificationValidator().validate(draft)) { error in
-            XCTAssertEqual(error as? FoundationNotify.Error, .validationFailed([.missingActionableCopy]))
+        #expect {
+            try NotificationValidator().validate(draft)
+        } throws: { error in
+            error as? FoundationNotify.Error == .validationFailed([.missingActionableCopy])
         }
     }
 
-    func testTooManyActionsFails() {
+    @Test func tooManyActionsFails() {
         let draft = NotificationDraft(
             title: "Review time",
             body: "Review five words now.",
@@ -56,12 +59,14 @@ final class NotificationValidatorTests: XCTestCase {
         )
         let constraints = NotificationConstraints(maxActionCount: 1)
 
-        XCTAssertThrowsError(try NotificationValidator().validate(draft, constraints: constraints)) { error in
-            XCTAssertEqual(error as? FoundationNotify.Error, .validationFailed([.tooManyActions(max: 1, actual: 2)]))
+        #expect {
+            try NotificationValidator().validate(draft, constraints: constraints)
+        } throws: { error in
+            error as? FoundationNotify.Error == .validationFailed([.tooManyActions(max: 1, actual: 2)])
         }
     }
 
-    func testInvalidActionIdentifiersFail() {
+    @Test func invalidActionIdentifiersFail() {
         let draft = NotificationDraft(
             title: "Review time",
             body: "Review five words now.",
@@ -72,18 +77,17 @@ final class NotificationValidatorTests: XCTestCase {
             ]
         )
 
-        XCTAssertThrowsError(try NotificationValidator().validate(draft)) { error in
-            XCTAssertEqual(
-                error as? FoundationNotify.Error,
-                .validationFailed([
+        #expect {
+            try NotificationValidator().validate(draft)
+        } throws: { error in
+            error as? FoundationNotify.Error == .validationFailed([
                     .emptyActionIdentifier(index: 1),
                     .duplicateActionIdentifier("REVIEW_NOW")
                 ])
-            )
         }
     }
 
-    func testActionTitleTooLongFails() {
+    @Test func actionTitleTooLongFails() {
         let draft = NotificationDraft(
             title: "Review time",
             body: "Review five words now.",
@@ -93,37 +97,75 @@ final class NotificationValidatorTests: XCTestCase {
         )
         let constraints = NotificationConstraints(maxActionTitleLength: 4)
 
-        XCTAssertThrowsError(try NotificationValidator().validate(draft, constraints: constraints)) { error in
-            XCTAssertEqual(
-                error as? FoundationNotify.Error,
-                .validationFailed([
+        #expect {
+            try NotificationValidator().validate(draft, constraints: constraints)
+        } throws: { error in
+            error as? FoundationNotify.Error == .validationFailed([
                     .actionTitleTooLong(identifier: "REVIEW_NOW", max: 4, actual: 10)
                 ])
-            )
         }
     }
 
-    func testPastDateTriggerFails() {
+    @Test func pastDateTriggerFails() {
         let now = Date(timeIntervalSince1970: 1_000)
         let trigger = NotificationTrigger.date(Date(timeIntervalSince1970: 999))
 
-        XCTAssertThrowsError(try NotificationValidator().validate(trigger, now: now)) { error in
-            XCTAssertEqual(
-                error as? FoundationNotify.Error,
-                .invalidSchedule("Date trigger must be in the future.")
-            )
+        #expect {
+            try NotificationValidator().validate(trigger, now: now)
+        } throws: { error in
+            error as? FoundationNotify.Error == .invalidSchedule("Date trigger must be in the future.")
         }
     }
 
-    func testInvalidRepeatingComponentsFail() {
-        var components = DateComponents()
-        components.hour = 24
+    @Test(arguments: InvalidRepeatingComponentCase.allCases)
+    func invalidRepeatingComponentsFail(_ testCase: InvalidRepeatingComponentCase) {
+        #expect {
+            try NotificationValidator().validate(.calendar(testCase.components, repeats: true))
+        } throws: { error in
+            error as? FoundationNotify.Error == testCase.expected
+        }
+    }
 
-        XCTAssertThrowsError(try NotificationValidator().validate(.calendar(components, repeats: true))) { error in
-            XCTAssertEqual(
-                error as? FoundationNotify.Error,
-                .invalidSchedule("Calendar hour must be between 0 and 23.")
-            )
+    enum InvalidRepeatingComponentCase: CaseIterable, Sendable {
+        case hour
+        case minute
+        case second
+        case weekday
+        case day
+        case empty
+
+        var components: DateComponents {
+            switch self {
+            case .hour:
+                return DateComponents(hour: 24)
+            case .minute:
+                return DateComponents(minute: 60)
+            case .second:
+                return DateComponents(second: 60)
+            case .weekday:
+                return DateComponents(weekday: 8)
+            case .day:
+                return DateComponents(day: 32)
+            case .empty:
+                return DateComponents()
+            }
+        }
+
+        var expected: FoundationNotify.Error {
+            switch self {
+            case .hour:
+                return .invalidSchedule("Calendar hour must be between 0 and 23.")
+            case .minute:
+                return .invalidSchedule("Calendar minute must be between 0 and 59.")
+            case .second:
+                return .invalidSchedule("Calendar second must be between 0 and 59.")
+            case .weekday:
+                return .invalidSchedule("Calendar weekday must be between 1 and 7.")
+            case .day:
+                return .invalidSchedule("Calendar day must be between 1 and 31.")
+            case .empty:
+                return .invalidSchedule("Repeating calendar triggers need at least one date component.")
+            }
         }
     }
 }

@@ -1,9 +1,9 @@
 import Foundation
-import XCTest
+import Testing
 @testable import FoundationNotify
 
-final class FoundationNotifyTests: XCTestCase {
-    func testGenerateValidatesDraft() async throws {
+struct FoundationNotifyTests {
+    @Test func generateValidatesDraft() async throws {
         let client = FoundationNotify.Client(
             generator: MockNotificationGenerator(
                 draft: NotificationDraft(title: "Review", body: "Review five words now.")
@@ -18,10 +18,10 @@ final class FoundationNotifyTests: XCTestCase {
             intent: .learning
         )
 
-        XCTAssertEqual(draft.title, "Review")
+        #expect(draft.title == "Review")
     }
 
-    func testScheduleGeneratedDraftAfterInterval() async throws {
+    @Test func scheduleGeneratedDraftAfterInterval() async throws {
         let scheduler = MockNotificationScheduler()
         let client = FoundationNotify.Client(
             generator: MockNotificationGenerator(
@@ -38,13 +38,13 @@ final class FoundationNotifyTests: XCTestCase {
             intent: .learning
         )
 
-        XCTAssertEqual(identifier, "mock-notification-id")
+        #expect(identifier == "mock-notification-id")
         let scheduled = await scheduler.scheduled
-        XCTAssertEqual(scheduled.count, 1)
-        XCTAssertEqual(scheduled.first?.trigger, .timeInterval(1_800, repeats: false))
+        #expect(scheduled.count == 1)
+        #expect(scheduled.first?.trigger == .timeInterval(1_800, repeats: false))
     }
 
-    func testScheduleDraftAtDate() async throws {
+    @Test func scheduleDraftAtDate() async throws {
         let scheduler = MockNotificationScheduler()
         let client = FoundationNotify.Client(
             generator: MockNotificationGenerator(
@@ -60,12 +60,12 @@ final class FoundationNotifyTests: XCTestCase {
             at: date
         )
 
-        XCTAssertEqual(identifier, "mock-notification-id")
+        #expect(identifier == "mock-notification-id")
         let scheduled = await scheduler.scheduled
-        XCTAssertEqual(scheduled.first?.trigger, .date(date))
+        #expect(scheduled.first?.trigger == .date(date))
     }
 
-    func testRepeatingScheduleUsesCalendarTrigger() async throws {
+    @Test func repeatingScheduleUsesCalendarTrigger() async throws {
         let scheduler = MockNotificationScheduler()
         let client = FoundationNotify.Client(
             generator: MockNotificationGenerator(
@@ -82,16 +82,18 @@ final class FoundationNotifyTests: XCTestCase {
             intent: .reminder
         )
 
-        let trigger = await scheduler.scheduled.first?.trigger
+        let scheduled = await scheduler.scheduled
+        let trigger = try #require(scheduled.first?.trigger)
         guard case let .calendar(components, repeats) = trigger else {
-            return XCTFail("Expected calendar trigger")
+            #expect(Bool(false))
+            return
         }
-        XCTAssertTrue(repeats)
-        XCTAssertEqual(components.hour, 8)
-        XCTAssertEqual(components.minute, 0)
+        #expect(repeats)
+        #expect(components.hour == 8)
+        #expect(components.minute == 0)
     }
 
-    func testAuthorizationDelegatesToAuthorizer() async throws {
+    @Test func authorizationDelegatesToAuthorizer() async throws {
         let client = FoundationNotify.Client(
             generator: MockNotificationGenerator(
                 draft: NotificationDraft(title: "Review", body: "Review now.")
@@ -101,8 +103,8 @@ final class FoundationNotifyTests: XCTestCase {
         )
 
         let granted = try await client.requestAuthorization()
-        XCTAssertTrue(granted)
+        #expect(granted)
         let status = await client.authorizationStatus()
-        XCTAssertEqual(status, .provisional)
+        #expect(status == .provisional)
     }
 }
