@@ -45,7 +45,7 @@ private extension FoundationModelsNotificationGenerator {
         guard case .available = model.availability else {
             return try await unavailableFallback(for: request)
         }
-        if let locale = request.locale, !model.supportsLocale(Locale(identifier: locale.rawValue)) {
+        if let locale = request.locale, !model.supportsLocale(locale) {
             return try await unavailableFallback(for: request)
         }
 
@@ -86,11 +86,11 @@ private extension FoundationModelsNotificationGenerator {
         """
     }
 
-    func localeInstruction(for locale: LocaleIdentifier?) -> String {
+    func localeInstruction(for locale: Locale?) -> String {
         guard let locale else {
             return "Use the user's current app language."
         }
-        return "Respond in the language appropriate for locale \(locale.rawValue)."
+        return "Respond in the language appropriate for locale \(locale.identifier)."
     }
 
     func temperature(for tone: NotificationTone) -> Double {

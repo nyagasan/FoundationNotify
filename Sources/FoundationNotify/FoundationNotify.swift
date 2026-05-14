@@ -12,7 +12,7 @@ public enum FoundationNotify {
         context: String,
         tone: NotificationTone,
         intent: NotificationIntent,
-        locale: LocaleIdentifier? = .current,
+        locale: Locale? = .current,
         constraints: NotificationConstraints = .default
     ) async throws -> NotificationDraft {
         try await client.generate(
@@ -68,7 +68,7 @@ public enum FoundationNotify {
         context: String,
         tone: NotificationTone,
         intent: NotificationIntent,
-        locale: LocaleIdentifier? = .current,
+        locale: Locale? = .current,
         constraints: NotificationConstraints = .default
     ) async throws -> String {
         try await client.schedule(
@@ -87,7 +87,7 @@ public enum FoundationNotify {
         context: String,
         tone: NotificationTone,
         intent: NotificationIntent,
-        locale: LocaleIdentifier? = .current,
+        locale: Locale? = .current,
         constraints: NotificationConstraints = .default
     ) async throws -> String {
         try await client.schedule(
@@ -106,7 +106,7 @@ public enum FoundationNotify {
         context: String,
         tone: NotificationTone,
         intent: NotificationIntent,
-        locale: LocaleIdentifier? = .current,
+        locale: Locale? = .current,
         constraints: NotificationConstraints = .default
     ) async throws -> String {
         try await client.schedule(

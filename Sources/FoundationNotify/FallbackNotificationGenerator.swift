@@ -115,7 +115,7 @@ public struct FallbackNotificationGenerator: NotificationGenerating {
     }
 
     private func localized(_ request: FoundationNotify.Request, japanese: String, english: String) -> String {
-        guard let identifier = request.locale?.rawValue.localizedLowercase else {
+        guard let identifier = request.locale?.identifier.localizedLowercase else {
             return english
         }
         return identifier.hasPrefix("ja") ? japanese : english

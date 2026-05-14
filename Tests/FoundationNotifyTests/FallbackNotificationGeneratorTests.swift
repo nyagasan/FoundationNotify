@@ -1,4 +1,5 @@
 import XCTest
+import Foundation
 @testable import FoundationNotify
 
 final class FallbackNotificationGeneratorTests: XCTestCase {
@@ -7,7 +8,7 @@ final class FallbackNotificationGeneratorTests: XCTestCase {
             context: "ユーザーは英単語学習中。復習を促したい。",
             tone: .friendly,
             intent: .reminder,
-            locale: "ja_JP"
+            locale: Locale(identifier: "ja_JP")
         )
 
         let draft = try await FallbackNotificationGenerator().generateNotification(for: request)
@@ -30,7 +31,7 @@ final class FallbackNotificationGeneratorTests: XCTestCase {
             context: "Review your vocabulary flashcards now.",
             tone: .professional,
             intent: .learning,
-            locale: "en_US",
+            locale: Locale(identifier: "en_US"),
             constraints: NotificationConstraints(maxTitleLength: 8, maxBodyLength: 12, requireActionableCopy: false)
         )
 
@@ -45,7 +46,7 @@ final class FallbackNotificationGeneratorTests: XCTestCase {
             context: "Review your vocabulary flashcards now.",
             tone: .professional,
             intent: .reminder,
-            locale: "en_US",
+            locale: Locale(identifier: "en_US"),
             constraints: NotificationConstraints(maxActionCount: 1, maxActionTitleLength: 6)
         )
 

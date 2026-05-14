@@ -24,7 +24,7 @@ public extension FoundationNotify {
             context: String,
             tone: NotificationTone,
             intent: NotificationIntent,
-            locale: LocaleIdentifier? = .current,
+            locale: Locale? = .current,
             constraints: NotificationConstraints = .default
         ) async throws -> NotificationDraft {
             let request = FoundationNotify.Request(
@@ -91,7 +91,7 @@ public extension FoundationNotify {
             context: String,
             tone: NotificationTone,
             intent: NotificationIntent,
-            locale: LocaleIdentifier? = .current,
+            locale: Locale? = .current,
             constraints: NotificationConstraints = .default
         ) async throws -> String {
             let draft = try await generate(
@@ -110,7 +110,7 @@ public extension FoundationNotify {
             context: String,
             tone: NotificationTone,
             intent: NotificationIntent,
-            locale: LocaleIdentifier? = .current,
+            locale: Locale? = .current,
             constraints: NotificationConstraints = .default
         ) async throws -> String {
             let draft = try await generate(
@@ -129,7 +129,7 @@ public extension FoundationNotify {
             context: String,
             tone: NotificationTone,
             intent: NotificationIntent,
-            locale: LocaleIdentifier? = .current,
+            locale: Locale? = .current,
             constraints: NotificationConstraints = .default
         ) async throws -> String {
             let draft = try await generate(
