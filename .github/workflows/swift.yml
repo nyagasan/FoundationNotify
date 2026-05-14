@@ -9,7 +9,7 @@ on:
 jobs:
   build-test:
     name: Build & Test (Xcode 26 / iOS 26 Simulator)
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,11 +17,11 @@ jobs:
       - name: Select Xcode
         run: |
           set -euo pipefail
-          XCODE_PATH="$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' -print | sort | tail -n 1)"
-          if [ -z "$XCODE_PATH" ]; then
-            XCODE_PATH="/Applications/Xcode.app"
-          fi
-          sudo xcode-select -s "$XCODE_PATH"
+          # macos-26 ships several Xcode 26 versions; only some have matching
+          # iOS simulator runtimes preinstalled. /Applications/Xcode.app points
+          # at the image's default stable Xcode whose iOS simulator runtime is
+          # always preinstalled (see actions/runner-images#13853).
+          sudo xcode-select -s /Applications/Xcode.app
 
       - name: Print toolchain
         run: |
@@ -31,6 +31,9 @@ jobs:
 
       - name: Swift build (compile check)
         run: swift build -Xswiftc -warnings-as-errors
+
+      - name: Swift test (host macOS)
+        run: swift test -Xswiftc -warnings-as-errors
 
       - name: Discover scheme
         id: scheme
@@ -46,6 +49,6 @@ jobs:
           set -euo pipefail
           xcodebuild test \
             -scheme "${{ steps.scheme.outputs.scheme }}" \
-            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16' \
+            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 17' \
             -skipMacroValidation \
             CODE_SIGNING_ALLOWED=NO
