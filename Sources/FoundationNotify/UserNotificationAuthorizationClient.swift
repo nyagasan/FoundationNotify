@@ -2,10 +2,10 @@
 @preconcurrency import UserNotifications
 
 /// Requests local notification authorization through `UNUserNotificationCenter`.
-public struct UserNotificationAuthorizationClient: NotificationAuthorizing, @unchecked Sendable {
+public actor UserNotificationAuthorizationClient: NotificationAuthorizing {
     private let center: UNUserNotificationCenter
 
-    public init(center: UNUserNotificationCenter = .current()) {
+    nonisolated public init(center: UNUserNotificationCenter = .current()) {
         self.center = center
     }
 
@@ -59,7 +59,7 @@ private extension NotificationAuthorizationStatus {
 }
 #else
 /// A placeholder authorizer for platforms where UserNotifications cannot be imported.
-public struct UserNotificationAuthorizationClient: NotificationAuthorizing {
+public actor UserNotificationAuthorizationClient: NotificationAuthorizing {
     public init() {}
 
     public func requestAuthorization(options: NotificationAuthorizationOptions = .default) async throws -> Bool {
