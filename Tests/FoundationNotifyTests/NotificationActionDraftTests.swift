@@ -25,8 +25,7 @@ struct NotificationActionDraftTests {
             {
               "maxTitleLength": 48,
               "maxBodyLength": 140,
-              "forbiddenPhrases": [],
-              "requireActionableCopy": true
+              "forbiddenPhrases": []
             }
             """.utf8
         )

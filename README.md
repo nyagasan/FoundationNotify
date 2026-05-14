@@ -16,7 +16,7 @@ FoundationNotify is a Swift Package for generating privacy-preserving local noti
 - Typed `NotificationDraft`, `NotificationTone`, `NotificationIntent`, constraints, triggers, and schedules.
 - Optional structured action buttons via `@Generable` / `UNNotificationCategory`.
 - `NotificationGenerating`, `NotificationScheduling`, and `NotificationAuthorizing` protocols for dependency injection.
-- Validation for empty copy, length limits, forbidden phrases, actionable copy, and invalid schedules.
+- Validation for empty copy, length limits, forbidden phrases, action structure, and invalid schedules.
 - Async/await adapters for `UNUserNotificationCenter`.
 - Foundation Models structured generation via `@Generable` and `LanguageModelSession`, with a deterministic fallback generator for unavailable devices and tests.
 
@@ -185,8 +185,7 @@ let constraints = NotificationConstraints(
     maxBodyLength: 140,
     maxActionCount: 3,
     maxActionTitleLength: 24,
-    forbiddenPhrases: ["limited time", "buy now"],
-    requireActionableCopy: true
+    forbiddenPhrases: ["limited time", "buy now"]
 )
 
 try await FoundationNotify.schedule(

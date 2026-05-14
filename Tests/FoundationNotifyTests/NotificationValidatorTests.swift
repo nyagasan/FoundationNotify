@@ -23,8 +23,7 @@ struct NotificationValidatorTests {
         let constraints = NotificationConstraints(
             maxTitleLength: 4,
             maxBodyLength: 10,
-            forbiddenPhrases: ["spam phrase"],
-            requireActionableCopy: true
+            forbiddenPhrases: ["spam phrase"]
         )
 
         #expect {
@@ -35,16 +34,6 @@ struct NotificationValidatorTests {
                     .bodyTooLong(max: 10, actual: 26),
                     .containsForbiddenPhrase("spam phrase")
                 ])
-        }
-    }
-
-    @Test func missingActionableCopyFailsWhenRequired() {
-        let draft = NotificationDraft(title: "Quiet note", body: "A short neutral sentence.")
-
-        #expect {
-            try NotificationValidator().validate(draft)
-        } throws: { error in
-            error as? FoundationNotify.Error == .validationFailed([.missingActionableCopy])
         }
     }
 

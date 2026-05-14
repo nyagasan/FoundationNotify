@@ -34,7 +34,7 @@ struct FallbackNotificationGeneratorTests {
             tone: .professional,
             intent: .learning,
             locale: "en_US",
-            constraints: NotificationConstraints(maxTitleLength: 8, maxBodyLength: 12, requireActionableCopy: false)
+            constraints: NotificationConstraints(maxTitleLength: 8, maxBodyLength: 12)
         )
 
         let draft = try await FallbackNotificationGenerator().generateNotification(for: request)

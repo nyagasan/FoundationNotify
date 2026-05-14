@@ -20,5 +20,4 @@ public enum NotificationValidationIssue: Sendable, Codable, Equatable {
     case duplicateActionIdentifier(String)
     case actionTitleTooLong(identifier: String, max: Int, actual: Int)
     case containsForbiddenPhrase(String)
-    case missingActionableCopy
 }
