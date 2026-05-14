@@ -1,8 +1,8 @@
-import XCTest
+import Testing
 @testable import FoundationNotify
 
-final class FallbackNotificationGeneratorTests: XCTestCase {
-    func testFallbackGeneratorCreatesJapaneseActionableDraft() async throws {
+struct FallbackNotificationGeneratorTests {
+    @Test func fallbackGeneratorCreatesJapaneseActionableDraft() async throws {
         let request = FoundationNotify.Request(
             context: "ユーザーは英単語学習中。復習を促したい。",
             tone: .friendly,
@@ -12,20 +12,23 @@ final class FallbackNotificationGeneratorTests: XCTestCase {
 
         let draft = try await FallbackNotificationGenerator().generateNotification(for: request)
 
-        XCTAssertFalse(draft.title.isEmpty)
-        XCTAssertTrue(draft.body.contains("復習"))
-        XCTAssertEqual(draft.categoryIdentifier, "reminder")
-        XCTAssertEqual(draft.userInfo["source"], "FoundationNotify")
-        XCTAssertEqual(
-            draft.actions,
-            [
+        #expect(!draft.title.isEmpty)
+        #expect(draft.body.contains("復習"))
+        #expect(draft.categoryIdentifier == "reminder")
+        #expect(draft.userInfo["source"] == "FoundationNotify")
+        #expect(
+            draft.actions == [
                 NotificationActionDraft(identifier: "REVIEW_NOW", title: "今すぐ確認"),
                 NotificationActionDraft(identifier: "LATER", title: "あとで")
             ]
         )
     }
 
-    func testFallbackGeneratorRespectsLengthConstraints() async throws {
+    @Test(arguments: [
+        GeneratedDraftLength.title(max: 8),
+        .body(max: 12)
+    ])
+    func fallbackGeneratorRespectsLengthConstraints(_ length: GeneratedDraftLength) async throws {
         let request = FoundationNotify.Request(
             context: "Review your vocabulary flashcards now.",
             tone: .professional,
@@ -36,11 +39,15 @@ final class FallbackNotificationGeneratorTests: XCTestCase {
 
         let draft = try await FallbackNotificationGenerator().generateNotification(for: request)
 
-        XCTAssertLessThanOrEqual(draft.title.count, 8)
-        XCTAssertLessThanOrEqual(draft.body.count, 12)
+        switch length {
+        case let .title(max):
+            #expect(draft.title.count <= max)
+        case let .body(max):
+            #expect(draft.body.count <= max)
+        }
     }
 
-    func testFallbackGeneratorRespectsActionConstraints() async throws {
+    @Test func fallbackGeneratorRespectsActionConstraints() async throws {
         let request = FoundationNotify.Request(
             context: "Review your vocabulary flashcards now.",
             tone: .professional,
@@ -51,8 +58,13 @@ final class FallbackNotificationGeneratorTests: XCTestCase {
 
         let draft = try await FallbackNotificationGenerator().generateNotification(for: request)
 
-        XCTAssertEqual(draft.actions, [
+        #expect(draft.actions == [
             NotificationActionDraft(identifier: "REVIEW_NOW", title: "Review")
         ])
+    }
+
+    enum GeneratedDraftLength: Sendable {
+        case title(max: Int)
+        case body(max: Int)
     }
 }
