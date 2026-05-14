@@ -77,13 +77,8 @@ final class FoundationNotifyViewModel {
 
     private func refreshFoundationModelsStatus() {
         #if canImport(FoundationModels)
-        if #available(iOS 26.0, *) {
-            foundationModelsStatusText = "available to import"
-            systemLanguageModelAvailabilityText = String(describing: SystemLanguageModel.default.availability)
-        } else {
-            foundationModelsStatusText = "requires iOS 26"
-            systemLanguageModelAvailabilityText = nil
-        }
+        foundationModelsStatusText = "available to import"
+        systemLanguageModelAvailabilityText = String(describing: SystemLanguageModel.default.availability)
         #else
         foundationModelsStatusText = "FoundationModels import unavailable"
         systemLanguageModelAvailabilityText = nil

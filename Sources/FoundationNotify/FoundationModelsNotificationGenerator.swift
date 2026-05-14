@@ -19,11 +19,7 @@ public struct FoundationModelsNotificationGenerator: NotificationGenerating {
 
     public func generateNotification(for request: FoundationNotify.Request) async throws -> NotificationDraft {
         #if canImport(FoundationModels)
-        if #available(iOS 26.0, macOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *) {
-            return try await generateWithFoundationModels(for: request)
-        } else {
-            return try await unavailableFallback(for: request)
-        }
+        return try await generateWithFoundationModels(for: request)
         #else
         return try await fallback.generateNotification(for: request)
         #endif
@@ -38,7 +34,6 @@ public struct FoundationModelsNotificationGenerator: NotificationGenerating {
 }
 
 #if canImport(FoundationModels)
-@available(iOS 26.0, macOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
 private extension FoundationModelsNotificationGenerator {
     func generateWithFoundationModels(for request: FoundationNotify.Request) async throws -> NotificationDraft {
         let model = SystemLanguageModel.default
@@ -105,7 +100,6 @@ private extension FoundationModelsNotificationGenerator {
     }
 }
 
-@available(iOS 26.0, macOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
 @Generable(description: "A single notification action button")
 private struct GeneratedAction: Sendable {
     @Guide(description: "A short uppercase snake_case identifier, e.g. REVIEW_NOW")
@@ -118,7 +112,6 @@ private struct GeneratedAction: Sendable {
     let foreground: Bool
 }
 
-@available(iOS 26.0, macOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
 @Generable(description: "A concise local notification draft with optional quick actions")
 private struct GeneratedNotificationDraft: Sendable {
     @Guide(description: "A short notification title.")
