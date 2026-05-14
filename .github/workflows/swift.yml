@@ -32,6 +32,9 @@ jobs:
       - name: Swift build (compile check)
         run: swift build -Xswiftc -warnings-as-errors
 
+      - name: Swift test (host macOS)
+        run: swift test -Xswiftc -warnings-as-errors
+
       - name: Discover scheme
         id: scheme
         run: |
