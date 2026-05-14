@@ -4,7 +4,7 @@ import Foundation
 @preconcurrency import UserNotifications
 
 /// Schedules local notifications through `UNUserNotificationCenter`.
-public struct UserNotificationScheduler: NotificationScheduling, @unchecked Sendable {
+public actor UserNotificationScheduler: NotificationScheduling {
     private let center: UNUserNotificationCenter
 
     public init(center: UNUserNotificationCenter = .current()) {
@@ -105,7 +105,7 @@ private extension NotificationActionDraft.Options {
 }
 #else
 /// A placeholder scheduler for platforms where UserNotifications cannot be imported.
-public struct UserNotificationScheduler: NotificationScheduling {
+public actor UserNotificationScheduler: NotificationScheduling {
     public init() {}
 
     public func schedule(_ draft: NotificationDraft, trigger: NotificationTrigger) async throws -> String {
