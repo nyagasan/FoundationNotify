@@ -81,20 +81,7 @@ public struct NotificationValidator: Sendable {
             }
         }
 
-        if constraints.requireActionableCopy && !containsActionableCopy(body) {
-            issues.append(.missingActionableCopy)
-        }
-
         return issues
-    }
-
-    private func containsActionableCopy(_ body: String) -> Bool {
-        let markers = [
-            "try", "start", "open", "check", "review", "remember", "take", "join", "go", "do",
-            "確認", "始め", "開", "復習", "試", "行", "見", "参加", "進め", "しましょう", "しよう"
-        ]
-        let normalized = body.localizedLowercase
-        return markers.contains { normalized.contains($0.localizedLowercase) }
     }
 
     private func validateCalendarComponents(_ components: DateComponents, repeats: Bool) throws {

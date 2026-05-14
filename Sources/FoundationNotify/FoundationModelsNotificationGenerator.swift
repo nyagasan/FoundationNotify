@@ -66,6 +66,7 @@ private extension FoundationModelsNotificationGenerator {
         Match the requested tone and intent.
         Keep the title at or below \(request.constraints.maxTitleLength) characters and the body at or below \(request.constraints.maxBodyLength) characters.
         \(localeInstruction(for: request.locale))
+        The body MUST end with a clear action verb or invitation that makes the next user step obvious — for example "Review now.", "Open the app to continue.", "散歩しましょう。", "5 分だけやってみよう。"
         """
     }
 
@@ -102,7 +103,7 @@ private extension FoundationModelsNotificationGenerator {
 
 @Generable(description: "A single notification action button")
 private struct GeneratedAction: Sendable {
-    @Guide(description: "A short uppercase snake_case identifier, e.g. REVIEW_NOW")
+    @Guide(description: "A short SCREAMING_SNAKE_CASE identifier, e.g. REVIEW_NOW, OPEN_LESSON.")
     let identifier: String
 
     @Guide(description: "A short user-facing button label.")
@@ -114,13 +115,13 @@ private struct GeneratedAction: Sendable {
 
 @Generable(description: "A concise local notification draft with optional quick actions")
 private struct GeneratedNotificationDraft: Sendable {
-    @Guide(description: "A short notification title.")
+    @Guide(description: "A short notification title. Avoid trailing punctuation and emoji-heavy copy.")
     let title: String
 
-    @Guide(description: "A concise notification body that contains one clear next action.")
+    @Guide(description: "A concise notification body. MUST end with a clear action verb or invitation that makes the next step obvious (e.g. 'Review now.', 'Open the app.', '散歩しましょう。', '〜してみよう。').")
     let body: String
 
-    @Guide(description: "Up to 3 quick action buttons. Empty list is acceptable.")
+    @Guide(description: "Up to 3 quick action buttons. Empty list is acceptable. Identifiers MUST be SCREAMING_SNAKE_CASE.")
     let actions: [GeneratedAction]
 
     func notificationDraft(for request: FoundationNotify.Request) -> NotificationDraft {

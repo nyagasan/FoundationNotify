@@ -16,7 +16,7 @@ FoundationNotify is a Swift Package for generating privacy-preserving local noti
 - Typed `NotificationDraft`, `NotificationTone`, `NotificationIntent`, constraints, triggers, and schedules.
 - Optional structured action buttons via `@Generable` / `UNNotificationCategory`.
 - `NotificationGenerating`, `NotificationScheduling`, and `NotificationAuthorizing` protocols for dependency injection.
-- Validation for empty copy, length limits, forbidden phrases, actionable copy, and invalid schedules.
+- Validation for empty copy, length limits, forbidden phrases, action structure, and invalid schedules.
 - Async/await adapters for `UNUserNotificationCenter`.
 - Foundation Models structured generation via `@Generable` and `LanguageModelSession`, with a deterministic fallback generator for unavailable devices and tests.
 
@@ -38,10 +38,9 @@ Then add the product to your target:
 
 - Xcode 26 or later.
 - Swift 6 language mode.
-- iOS 26+, macOS 26+, watchOS 26+, tvOS 26+, or visionOS 26+ to build and schedule local notifications.
+- iOS 26+, macOS 26+, watchOS 26+, tvOS 26+, or visionOS 26+.
 - `UserNotifications` for real scheduling.
-- Apple Foundation Models for on-device generation: **iOS 26+, macOS 26+, or visionOS 26+**. Apple ships the framework with `@available(watchOS, unavailable)` and `@available(tvOS, unavailable)`; on those two platforms FoundationNotify builds successfully and uses `FallbackNotificationGenerator` (deterministic, no AI).
-- An Apple Intelligence–capable device (iPhone 15 Pro, iPhone 16 series or later, M-series iPad or Mac, or Apple Vision Pro), with Apple Intelligence enabled and the on-device model downloaded. Runtime model availability still depends on user settings, the device's system language, and model readiness.
+- Apple Foundation Models on iOS 26 and sibling OS releases. Runtime model availability still depends on Apple Intelligence support, user settings, and model readiness.
 
 ## Quick Start
 
@@ -185,8 +184,7 @@ let constraints = NotificationConstraints(
     maxBodyLength: 140,
     maxActionCount: 3,
     maxActionTitleLength: 24,
-    forbiddenPhrases: ["limited time", "buy now"],
-    requireActionableCopy: true
+    forbiddenPhrases: ["limited time", "buy now"]
 )
 
 try await FoundationNotify.schedule(

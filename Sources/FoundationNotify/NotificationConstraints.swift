@@ -5,7 +5,6 @@ public struct NotificationConstraints: Sendable, Codable, Equatable {
     public var maxActionCount: Int
     public var maxActionTitleLength: Int
     public var forbiddenPhrases: [String]
-    public var requireActionableCopy: Bool
 
     private enum CodingKeys: String, CodingKey {
         case maxTitleLength
@@ -13,7 +12,6 @@ public struct NotificationConstraints: Sendable, Codable, Equatable {
         case maxActionCount
         case maxActionTitleLength
         case forbiddenPhrases
-        case requireActionableCopy
     }
 
     public init(
@@ -21,15 +19,13 @@ public struct NotificationConstraints: Sendable, Codable, Equatable {
         maxBodyLength: Int = 180,
         maxActionCount: Int = 3,
         maxActionTitleLength: Int = 24,
-        forbiddenPhrases: [String] = [],
-        requireActionableCopy: Bool = true
+        forbiddenPhrases: [String] = []
     ) {
         self.maxTitleLength = maxTitleLength
         self.maxBodyLength = maxBodyLength
         self.maxActionCount = maxActionCount
         self.maxActionTitleLength = maxActionTitleLength
         self.forbiddenPhrases = forbiddenPhrases
-        self.requireActionableCopy = requireActionableCopy
     }
 
     public init(from decoder: any Decoder) throws {
@@ -39,7 +35,6 @@ public struct NotificationConstraints: Sendable, Codable, Equatable {
         maxActionCount = try container.decodeIfPresent(Int.self, forKey: .maxActionCount) ?? 3
         maxActionTitleLength = try container.decodeIfPresent(Int.self, forKey: .maxActionTitleLength) ?? 24
         forbiddenPhrases = try container.decodeIfPresent([String].self, forKey: .forbiddenPhrases) ?? []
-        requireActionableCopy = try container.decodeIfPresent(Bool.self, forKey: .requireActionableCopy) ?? true
     }
 
     public static let `default` = NotificationConstraints()
