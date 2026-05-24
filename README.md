@@ -9,6 +9,12 @@ AI-generated local notifications powered by Apple Foundation Models.
 
 FoundationNotify is a Swift Package for generating privacy-preserving local notification copy on device and scheduling it with `UNUserNotificationCenter`. It targets Local Notifications only. It does not send remote Push Notifications, does not integrate with APNs, and does not require a notification server.
 
+## Demo
+
+<video src="./demo.mov" controls width="320"></video>
+
+If the embedded player above doesn't render in your viewer, open the file directly: [**demo.mov**](./demo.mov).
+
 ## Features
 
 - Swift-native API for AI-generated local notifications.
